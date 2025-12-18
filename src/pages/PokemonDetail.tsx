@@ -1,13 +1,212 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchPokemonDetails, fetchPokemonSpecies } from "../services/pokeapi";
+import { convertHeight, convertWeight, getEnglishDescription } from "../utils/pokemon";
+import type { Pokemon, PokemonSpecies } from "../types/pokemon";
 
 const PokemonDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const [pokemon, setPokemon] = useState<Pokemon | null>(null);
+    const [species, setSpecies] = useState<PokemonSpecies | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const loadPokemonData = async () => {
+            if (!id) return;
+
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Fetch Pokemon details and species data in parallel
+                const [pokemonData, speciesData] = await Promise.all([
+                    fetchPokemonDetails(id),
+                    fetchPokemonSpecies(id),
+                ]);
+
+                setPokemon(pokemonData);
+                setSpecies(speciesData);
+            } catch (err) {
+                const errorMessage =
+                    err instanceof Error ? err.message : "An error occurred while loading Pokémon";
+                setError(errorMessage);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPokemonData();
+    }, [id]);
+
+    const handleBack = () => {
+        navigate("/");
+    };
+
+    // Render loading state
+    if (loading) {
+        return (
+            <div className="pokemon-detail-container">
+                <h1>Pokédex</h1>
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    // Render error state
+    if (error || !pokemon) {
+        return (
+            <div className="pokemon-detail-container">
+                <h1>Pokédex</h1>
+                <div className="error-message">
+                    <p>Error: {error || "Pokémon not found"}</p>
+                </div>
+                <button className="back-button" onClick={handleBack}>
+                    Back to List
+                </button>
+            </div>
+        );
+    }
+
+    // Get description
+    const description = species ? getEnglishDescription(species.flavor_text_entries) : undefined;
 
     return (
-        <div>
-            <h1>Pokémon Detail</h1>
-            <p>Loading Pokémon {id}...</p>
+        <div className="pokemon-detail-container">
+            <h1>Pokédex</h1>
+
+            <button className="back-button" onClick={handleBack}>
+                ← Back to List
+            </button>
+
+            <div className="pokemon-detail-card">
+                {/* High quality sprite */}
+                <div className="pokemon-detail-image">
+                    <img
+                        src={pokemon.sprites.other["official-artwork"].front_default}
+                        alt={pokemon.name}
+                        className="pokemon-artwork"
+                    />
+                </div>
+
+                {/* Basic Information */}
+                <div className="pokemon-detail-info">
+                    <h2 className="pokemon-detail-name">
+                        {pokemon.name}
+                        <span className="pokemon-detail-id">#{pokemon.id}</span>
+                    </h2>
+
+                    {/* Types */}
+                    <div className="pokemon-types">
+                        {pokemon.types
+                            .sort((a, b) => a.slot - b.slot)
+                            .map((typeInfo) => (
+                                <span key={typeInfo.slot} className="pokemon-type-badge">
+                                    {typeInfo.type.name}
+                                </span>
+                            ))}
+                    </div>
+
+                    {/* Physical stats */}
+                    <div className="pokemon-physical-stats">
+                        <div className="stat-item">
+                            <span className="stat-label">Height:</span>
+                            <span className="stat-value">{convertHeight(pokemon.height)} m</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-label">Weight:</span>
+                            <span className="stat-value">{convertWeight(pokemon.weight)} kg</span>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    {description && (
+                        <div className="pokemon-description">
+                            <p>{description}</p>
+                        </div>
+                    )}
+
+                    {/* Base Stats */}
+                    <div className="pokemon-base-stats">
+                        <h3>Base Stats</h3>
+                        <div className="stats-list">
+                            <div className="stat-row">
+                                <span className="stat-name">HP</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[0].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[0].base_stat}</span>
+                            </div>
+                            <div className="stat-row">
+                                <span className="stat-name">Attack</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[1].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[1].base_stat}</span>
+                            </div>
+                            <div className="stat-row">
+                                <span className="stat-name">Defense</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[2].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[2].base_stat}</span>
+                            </div>
+                            <div className="stat-row">
+                                <span className="stat-name">Sp. Atk</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[3].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[3].base_stat}</span>
+                            </div>
+                            <div className="stat-row">
+                                <span className="stat-name">Sp. Def</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[4].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[4].base_stat}</span>
+                            </div>
+                            <div className="stat-row">
+                                <span className="stat-name">Speed</span>
+                                <span className="stat-bar-container">
+                                    <span
+                                        className="stat-bar"
+                                        style={{
+                                            width: `${(pokemon.stats[5].base_stat / 255) * 100}%`,
+                                        }}
+                                    ></span>
+                                </span>
+                                <span className="stat-number">{pokemon.stats[5].base_stat}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
