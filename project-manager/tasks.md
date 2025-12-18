@@ -140,16 +140,17 @@
     -   [x] Stats display format
     -   [x] Type badges
 
+### Phase 7: Ajouter Docker pour le projet - ✅ COMPLETED
+
+-   [x] Ajouter un Dockerfile multi-stage (development & production)
+-   [x] Ajouter un docker-compose.yml pour le développement
+-   [x] Ajouter un .dockerignore
+-   [x] Configurer le hot reload
+-   [x] Vérifier le lancement du projet via Docker
+
 ## In Progress
 
 ## Planned
-
-### Phase 7: Ajouter un Dockerfile pour le projet frontend
-
--   [ ] Ajouter un docker-compose.yml pour le développement
--   [ ] Ajouter un .dockerignore
--   [ ] Configurer le hot reload
--   [ ] Vérifier le lancement du projet via Docker
 
 ### Phase 8: Documentation
 
