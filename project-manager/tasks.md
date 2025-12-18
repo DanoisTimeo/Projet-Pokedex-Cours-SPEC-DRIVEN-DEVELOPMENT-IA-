@@ -144,41 +144,14 @@
 
 ## Planned
 
-### Phase 7: Error Handling & Loading States
+### Phase 7: Ajouter un Dockerfile pour le projet frontend
 
--   [ ] Implement error boundary component
--   [ ] Add error display zone
-    -   [ ] Show API error messages
-    -   [ ] User-friendly error descriptions
-    -   [ ] Non-blocking error display
--   [ ] Refine loading indicators
-    -   [ ] Loading only in active zones
-    -   [ ] Simple "Loading..." text
+-   [ ] Ajouter un docker-compose.yml pour le développement
+-   [ ] Ajouter un .dockerignore
+-   [ ] Configurer le hot reload
+-   [ ] Vérifier le lancement du projet via Docker
 
-### Phase 8: Keyboard Navigation
-
--   [ ] Implement arrow key scrolling
--   [ ] Implement Enter key for search validation
--   [ ] Add keyboard shortcuts documentation (optional)
-
-### Phase 9: Responsive Design
-
--   [ ] Make Game Boy frame responsive
--   [ ] Scale frame while preserving aspect ratio
--   [ ] Test on different screen sizes
--   [ ] Ensure readability on mobile
-
-### Phase 10: Polish & Testing
-
--   [ ] Test all API endpoints
--   [ ] Verify data transformations (height, weight, description)
--   [ ] Test pagination edge cases
--   [ ] Test search with various inputs
--   [ ] Verify keyboard navigation
--   [ ] Cross-browser testing
--   [ ] Performance optimization (if needed)
-
-### Phase 11: Documentation
+### Phase 8: Documentation
 
 -   [ ] Update README.md with project description
 -   [ ] Add installation instructions
