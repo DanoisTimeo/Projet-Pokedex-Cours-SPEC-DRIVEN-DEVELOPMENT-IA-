@@ -148,13 +148,15 @@
 -   [x] Configurer le hot reload
 -   [x] Vérifier le lancement du projet via Docker
 
+### Phase 8: Documentation - ✅ COMPLETED
+
+-   [x] Update README.md with project description
+-   [x] Add installation instructions (npm and Docker)
+-   [x] Add usage guide (browsing, searching, navigation)
+-   [x] Document API limitations and constraints
+-   [x] Document tech stack and project structure
+-   [x] Add Docker commands reference
+
 ## In Progress
 
 ## Planned
-
-### Phase 8: Documentation
-
--   [ ] Update README.md with project description
--   [ ] Add installation instructions
--   [ ] Add usage guide
--   [ ] Document API limitations
