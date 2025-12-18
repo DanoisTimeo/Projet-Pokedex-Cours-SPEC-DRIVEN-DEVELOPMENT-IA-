@@ -24,6 +24,76 @@ body {
     color: #333;
 }
 
+/* Search Bar */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    max-width: 400px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: #e63946;
+}
+
+.search-button {
+    background-color: #e63946;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+    background-color: #d62839;
+}
+
+.clear-button {
+    background-color: #666;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clear-button:hover {
+    background-color: #555;
+}
+
+/* No Results Message */
+.no-results-message {
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.no-results-message p {
+    color: #856404;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
 /* Pokemon Grid */
 .pokemon-grid {
     display: grid;

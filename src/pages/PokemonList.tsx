@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchPokemonList, fetchPokemonDetails } from "../services/pokeapi";
 import PokemonCard from "../components/PokemonCard";
+import SearchBar from "../components/SearchBar";
 import type { Pokemon } from "../types/pokemon";
 
 const PokemonList: React.FC = () => {
@@ -10,6 +11,9 @@ const PokemonList: React.FC = () => {
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [isSearchMode, setIsSearchMode] = useState(false);
+    const [searchResult, setSearchResult] = useState<Pokemon | null>(null);
+    const [searchNotFound, setSearchNotFound] = useState(false);
 
     const LIMIT = 20;
 
@@ -70,6 +74,44 @@ const PokemonList: React.FC = () => {
         loadPokemon(newOffset, true);
     };
 
+    // Handle search
+    const handleSearch = async (query: string) => {
+        setIsSearchMode(true);
+        setLoading(true);
+        setError(null);
+        setSearchNotFound(false);
+        setSearchResult(null);
+
+        try {
+            // Try to fetch Pokemon by name or ID
+            const pokemon = await fetchPokemonDetails(query);
+            setSearchResult(pokemon);
+        } catch (err) {
+            // If error message is "No Pokémon found", show the specific message
+            if (err instanceof Error && err.message === "No Pokémon found") {
+                setSearchNotFound(true);
+            } else {
+                const errorMessage =
+                    err instanceof Error ? err.message : "An error occurred while searching";
+                setError(errorMessage);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle clear search
+    const handleClearSearch = () => {
+        setIsSearchMode(false);
+        setSearchResult(null);
+        setSearchNotFound(false);
+        setError(null);
+        // Reload the list if it's empty
+        if (pokemonList.length === 0) {
+            loadPokemon(0);
+        }
+    };
+
     // Render loading state
     if (loading) {
         return (
@@ -96,22 +138,43 @@ const PokemonList: React.FC = () => {
         <div className="pokemon-list-container">
             <h1>Pokédex</h1>
 
-            <div className="pokemon-grid">
-                {pokemonList.map((pokemon) => (
-                    <PokemonCard key={pokemon.id} pokemon={pokemon} />
-                ))}
-            </div>
+            <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
 
-            {hasMore && (
-                <div className="pagination-controls">
-                    <button
-                        onClick={handleLoadMore}
-                        disabled={loadingMore}
-                        className="load-more-button"
-                    >
-                        {loadingMore ? "Loading..." : "Load More"}
-                    </button>
+            {/* Show "No Pokémon found" message */}
+            {searchNotFound && (
+                <div className="no-results-message">
+                    <p>No Pokémon found</p>
                 </div>
+            )}
+
+            {/* Show search result */}
+            {isSearchMode && searchResult && (
+                <div className="pokemon-grid">
+                    <PokemonCard key={searchResult.id} pokemon={searchResult} />
+                </div>
+            )}
+
+            {/* Show regular list */}
+            {!isSearchMode && (
+                <>
+                    <div className="pokemon-grid">
+                        {pokemonList.map((pokemon) => (
+                            <PokemonCard key={pokemon.id} pokemon={pokemon} />
+                        ))}
+                    </div>
+
+                    {hasMore && (
+                        <div className="pagination-controls">
+                            <button
+                                onClick={handleLoadMore}
+                                disabled={loadingMore}
+                                className="load-more-button"
+                            >
+                                {loadingMore ? "Loading..." : "Load More"}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );

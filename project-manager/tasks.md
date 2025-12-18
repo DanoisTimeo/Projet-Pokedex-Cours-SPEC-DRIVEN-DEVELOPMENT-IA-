@@ -74,21 +74,30 @@
     -   [x] Responsive card sizing
     -   [x] Hover animations and transitions
 
+### Phase 4: Search Functionality - ✅ COMPLETED
+
+-   [x] Create SearchBar component
+    -   [x] Input field for name or ID
+    -   [x] Search button
+    -   [x] Enter key validation
+    -   [x] Clear button to return to list
+    -   [x] Created src/components/SearchBar.tsx
+-   [x] Implement search logic
+    -   [x] Search by Pokemon name (English)
+    -   [x] Search by Pokemon ID (number)
+    -   [x] Display "No Pokémon found" message on no results
+    -   [x] Clear search and return to list
+    -   [x] Integrated into PokemonList component
+    -   [x] Search mode displays single result
+    -   [x] Error handling for invalid searches
+-   [x] Styling
+    -   [x] Search bar layout and styling
+    -   [x] "No Pokémon found" message styling
+    -   [x] Responsive search input
+
 ## In Progress
 
 ## Planned
-
-### Phase 4: Search Functionality
-
--   [ ] Create SearchBar component
-    -   [ ] Input field for name or ID
-    -   [ ] Search button
-    -   [ ] Enter key validation
--   [ ] Implement search logic
-    -   [ ] Search by Pokemon name (English)
-    -   [ ] Search by Pokemon ID (number)
-    -   [ ] Display "No Pokémon found" message on no results
-    -   [ ] Clear search and return to list
 
 ### Phase 5: Pokemon Detail Page
 
