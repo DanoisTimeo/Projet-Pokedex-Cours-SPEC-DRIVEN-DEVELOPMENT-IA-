@@ -215,6 +215,77 @@ Used to retrieve the description and additional information about a Pokémon.
 
 ---
 
+## Evolution Chain
+
+Endpoint:  
+GET /evolution-chain/{id}
+
+Use this endpoint to retrieve the full evolution chain for a species. The canonical way to find the correct evolution chain for a Pokémon is:
+
+1. Call `GET /pokemon-species/{id or name}` → read `evolution_chain.url`.
+2. Call `GET /evolution-chain/{id}` (use the URL from the species resource).
+
+### Retrievable Data
+
+- `chain` (object): recursive structure describing species and their `evolves_to` children.
+    - Root species: `chain.species.name`
+    - Next evolutions: `chain.evolves_to[]` → each item has `species` and possibly nested `evolves_to`.
+- `evolution_details[]` on each chain link contains conditions (level, item, trigger), but for the Pokédex feature we only use species names and images.
+
+### Notes
+
+- Evolution-chain IDs are independent from Pokémon IDs. Example: Pokémon with IDs `1`, `2`, `3` can belong to `evolution-chain` with id `1`, while another chain (id `2`) can contain Pokémon with IDs `4`, `5`, `6`. Do not assume `evolution-chain.id === pokemon.id`.
+- The `evolution-chain` and `evolution_details` objects contain more information than we use for the Pokédex view, for example:
+    - `evolution_details[].min_level` (minimum level required)
+    - `evolution_details[].item` (item required)
+    - `evolution_details[].trigger` (trigger type: level-up, trade, use-item, etc.)
+    - other conditional fields (`gender`, `held_item`, `known_move`, `location`, `time_of_day`, `min_happiness`, `needs_overworld_rain`, ...)
+    We keep these fields documented here but they are not displayed in the current UI.
+
+### Recommended image/id retrieval (Option A - reliable)
+
+- For each species name found in the evolution `chain`, call `GET /pokemon/{name}` to obtain `id` and `sprites.other['official-artwork'].front_default`.
+- This method guarantees correct image URLs and IDs even for edge cases (forms, variants).
+
+### Example simplified evolution-chain response
+
+```json
+{
+    "id": 1,
+    "chain": {
+        "species": { "name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/" },
+        "evolves_to": [
+            {
+                "species": { "name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon-species/2/" },
+                "evolves_to": [
+                    { "species": { "name": "venusaur", "url": "https://pokeapi.co/api/v2/pokemon-species/3/" }, "evolves_to": [] }
+                ]
+            }
+        ]
+    }
+}
+```
+
+### Example retrieval flow (JS)
+
+```javascript
+// 1. Get species to obtain evolution_chain URL
+const species = await fetch('https://pokeapi.co/api/v2/pokemon-species/bulbasaur/').then(r => r.json());
+const chain = await fetch(species.evolution_chain.url).then(r => r.json());
+
+// 2. Collect species names recursively
+function collectNames(node, list = []) {
+    list.push(node.species.name);
+    (node.evolves_to || []).forEach(child => collectNames(child, list));
+    return list;
+}
+const names = collectNames(chain.chain);
+
+// 3. For each name, call /pokemon/{name} to get images/ids
+const pokemons = await Promise.all(names.map(n => fetch(`https://pokeapi.co/api/v2/pokemon/${n}`).then(r => r.json())));
+```
+
+
 ## Data Retrieval Guide
 
 ### Complete Example for Displaying a Pokémon
