@@ -62,6 +62,9 @@ export interface PokemonSpecies {
     id: number;
     name: string;
     flavor_text_entries: FlavorTextEntry[];
+    evolution_chain: {
+        url: string;
+    };
 }
 
 export interface PokemonListResponse {
@@ -69,4 +72,26 @@ export interface PokemonListResponse {
     next: string | null;
     previous: string | null;
     results: PokemonListItem[];
+}
+
+// Evolution Chain interfaces
+export interface ChainSpecies {
+    name: string;
+    url: string;
+}
+
+export interface ChainNode {
+    species: ChainSpecies;
+    evolves_to: ChainNode[];
+}
+
+export interface EvolutionChain {
+    id: number;
+    chain: ChainNode;
+}
+
+export interface EvolutionDisplayData {
+    name: string;
+    id: number;
+    imageUrl: string;
 }
