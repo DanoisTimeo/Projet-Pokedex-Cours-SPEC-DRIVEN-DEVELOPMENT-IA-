@@ -11,6 +11,7 @@ described in the documentation files located in the `docs/` directory.
 - Read `docs/02-pokeapi.md` to fully understand the API usage and data scope.
 - Read `docs/03-ui-gameboy.md` to respect the UI and UX constraints.
 - Read `docs/04-evolution-chain.md` for the Pokédex feature spec (shows evolution chain: name, default-form image, clickable link to detail page).
+- Read `docs/05-detail-navigation.md` for the detail navigation feature spec (previous/next Pokemon navigation from detail page).
 - Check `project-manager/general-objectives.md` before making technical decisions.
 - Maintain `project-manager/tasks.md` as the single source of truth for progress tracking.
 

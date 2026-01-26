@@ -196,3 +196,28 @@
 ## In Progress
 
 ## Planned
+
+### Phase 0.2: Pokemon Detail Navigation Feature
+
+- [ ] Add navigation buttons to Pokemon detail page
+    - [ ] Add Previous button (← Previous)
+    - [ ] Add Next button (Next →)
+    - [ ] Position controls near back button or in header
+- [ ] Implement navigation logic
+    - [ ] Navigate to Pokemon (current ID - 1) for Previous
+    - [ ] Navigate to Pokemon (current ID + 1) for Next
+    - [ ] Update URL route to new Pokemon ID
+    - [ ] Handle loading states during navigation
+- [ ] Handle edge cases and errors
+    - [ ] Disable Previous button on Pokemon #1
+    - [ ] Handle non-existent Pokemon IDs gracefully (404 errors)
+    - [ ] Determine and handle reasonable upper bounds for Pokemon IDs
+    - [ ] Show appropriate error states
+- [ ] Style navigation controls
+    - [ ] Match Game Boy pixel-art aesthetic
+    - [ ] Clear enabled/disabled button states
+    - [ ] Responsive layout for small screens
+- [ ] Manual test navigation functionality
+    - [ ] Test navigation from various Pokemon (start, middle, high IDs)
+    - [ ] Test edge cases (ID 1, non-existent IDs)
+    - [ ] Validate smooth user experience
