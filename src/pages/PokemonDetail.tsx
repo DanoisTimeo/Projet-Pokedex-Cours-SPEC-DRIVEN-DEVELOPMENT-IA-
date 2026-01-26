@@ -13,6 +13,7 @@ const PokemonDetail: React.FC = () => {
     const [evolutions, setEvolutions] = useState<EvolutionDisplayData[]>([]);
     const [loading, setLoading] = useState(true);
     const [evolutionLoading, setEvolutionLoading] = useState(false);
+    const [navigationLoading, setNavigationLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [evolutionError, setEvolutionError] = useState<string | null>(null);
 
@@ -63,6 +64,34 @@ const PokemonDetail: React.FC = () => {
         navigate("/");
     };
 
+    const handlePrevious = async () => {
+        if (!pokemon || pokemon.id <= 1 || navigationLoading) return;
+        
+        setNavigationLoading(true);
+        try {
+            navigate(`/pokemon/${pokemon.id - 1}`);
+        } catch (err) {
+            console.error("Navigation error:", err);
+        } finally {
+            // Navigation loading will be reset by the new component mount
+            setNavigationLoading(false);
+        }
+    };
+
+    const handleNext = async () => {
+        if (!pokemon || navigationLoading) return;
+        
+        setNavigationLoading(true);
+        try {
+            navigate(`/pokemon/${pokemon.id + 1}`);
+        } catch (err) {
+            console.error("Navigation error:", err);
+        } finally {
+            // Navigation loading will be reset by the new component mount
+            setNavigationLoading(false);
+        }
+    };
+
     // Render loading state
     if (loading) {
         return (
@@ -95,9 +124,28 @@ const PokemonDetail: React.FC = () => {
         <div className="pokemon-detail-container">
             <h1>Pokédex</h1>
 
-            <button className="back-button" onClick={handleBack}>
-                ← Back to List
-            </button>
+            <div className="pokemon-detail-navigation">
+                <button className="back-button" onClick={handleBack}>
+                    ← Back to List
+                </button>
+                
+                <div className="pokemon-navigation-controls">
+                    <button 
+                        className="nav-button nav-previous" 
+                        onClick={handlePrevious}
+                        disabled={pokemon.id <= 1 || navigationLoading}
+                    >
+                        {navigationLoading ? "Loading..." : "← Previous"}
+                    </button>
+                    <button 
+                        className="nav-button nav-next" 
+                        onClick={handleNext}
+                        disabled={navigationLoading}
+                    >
+                        {navigationLoading ? "Loading..." : "Next →"}
+                    </button>
+                </div>
+            </div>
 
             <div className="pokemon-detail-card">
                 {/* High quality sprite */}

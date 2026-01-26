@@ -843,6 +843,71 @@ input {
     margin-top: 50px;
 }
 
+/* Pokemon Detail Navigation */
+.pokemon-detail-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pokemon-navigation-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-button {
+    font-family: "Press Start 2P", cursive;
+    background-color: #f8f9fa;
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 110px;
+}
+
+.nav-button:hover:not(:disabled) {
+    background-color: #e63946;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.nav-button:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+}
+
+.nav-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Responsive navigation */
+@media (max-width: 768px) {
+    .pokemon-detail-navigation {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pokemon-navigation-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .nav-button {
+        flex: 1;
+        min-width: 0;
+        font-size: 0.7rem;
+        padding: 10px 12px;
+    }
+}
+
 /* Evolution Chain Styling */
 .evolution-chain {
     margin-top: 30px;

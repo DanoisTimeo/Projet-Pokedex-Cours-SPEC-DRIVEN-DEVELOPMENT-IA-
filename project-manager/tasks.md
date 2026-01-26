@@ -195,29 +195,29 @@
 
 ## In Progress
 
-## Planned
-
 ### Phase 0.2: Pokemon Detail Navigation Feature
 
-- [ ] Add navigation buttons to Pokemon detail page
-    - [ ] Add Previous button (← Previous)
-    - [ ] Add Next button (Next →)
-    - [ ] Position controls near back button or in header
-- [ ] Implement navigation logic
-    - [ ] Navigate to Pokemon (current ID - 1) for Previous
-    - [ ] Navigate to Pokemon (current ID + 1) for Next
-    - [ ] Update URL route to new Pokemon ID
-    - [ ] Handle loading states during navigation
-- [ ] Handle edge cases and errors
-    - [ ] Disable Previous button on Pokemon #1
-    - [ ] Handle non-existent Pokemon IDs gracefully (404 errors)
-    - [ ] Determine and handle reasonable upper bounds for Pokemon IDs
-    - [ ] Show appropriate error states
-- [ ] Style navigation controls
-    - [ ] Match Game Boy pixel-art aesthetic
-    - [ ] Clear enabled/disabled button states
-    - [ ] Responsive layout for small screens
+- [x] Add navigation buttons to Pokemon detail page
+    - [x] Add Previous button (← Previous)
+    - [x] Add Next button (Next →)
+    - [x] Position controls near back button or in header
+- [x] Implement navigation logic
+    - [x] Navigate to Pokemon (current ID - 1) for Previous
+    - [x] Navigate to Pokemon (current ID + 1) for Next
+    - [x] Update URL route to new Pokemon ID
+    - [x] Handle loading states during navigation
+- [x] Handle edge cases and errors
+    - [x] Disable Previous button on Pokemon #1
+    - [x] Handle non-existent Pokemon IDs gracefully (404 errors)
+    - [x] Determine and handle reasonable upper bounds for Pokemon IDs
+    - [x] Show appropriate error states
+- [x] Style navigation controls
+    - [x] Match Game Boy pixel-art aesthetic
+    - [x] Clear enabled/disabled button states
+    - [x] Responsive layout for small screens
 - [ ] Manual test navigation functionality
     - [ ] Test navigation from various Pokemon (start, middle, high IDs)
     - [ ] Test edge cases (ID 1, non-existent IDs)
     - [ ] Validate smooth user experience
+
+## Planned
