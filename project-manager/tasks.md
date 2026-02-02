@@ -193,9 +193,7 @@
 - [x] Navigation between evolution stages functional
 - [x] Proper handling of edge cases (single Pokemon chains)
 
-## In Progress
-
-### Phase 0.2: Pokemon Detail Navigation Feature
+### Phase 1.2: Pokemon Detail Navigation Feature
 
 - [x] Add navigation buttons to Pokemon detail page
     - [x] Add Previous button (← Previous)
@@ -215,9 +213,11 @@
     - [x] Match Game Boy pixel-art aesthetic
     - [x] Clear enabled/disabled button states
     - [x] Responsive layout for small screens
-- [ ] Manual test navigation functionality
-    - [ ] Test navigation from various Pokemon (start, middle, high IDs)
-    - [ ] Test edge cases (ID 1, non-existent IDs)
-    - [ ] Validate smooth user experience
+- [x] Manual test navigation functionality
+    - [x] Test navigation from various Pokemon (start, middle, high IDs)
+    - [x] Test edge cases (ID 1, non-existent IDs)
+    - [x] Validate smooth user experience
+
+## In Progress
 
 ## Planned
