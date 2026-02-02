@@ -10,10 +10,13 @@ described in the documentation files located in the `docs/` directory.
 - Start with `docs/01-introduction.md` to understand the Pokédex concept.
 - Read `docs/02-pokeapi.md` to fully understand the API usage and data scope.
 - Read `docs/03-ui-gameboy.md` to respect the UI and UX constraints.
+- Read `docs/04-evolution-chain.md` for the Pokédex feature spec (shows evolution chain: name, default-form image, clickable link to detail page).
+- Read `docs/05-detail-navigation.md` for the detail navigation feature spec (previous/next Pokemon navigation from detail page).
 - Check `project-manager/general-objectives.md` before making technical decisions.
 - Maintain `project-manager/tasks.md` as the single source of truth for progress tracking.
 
 ## Working guidelines
+
 - Treat the Markdown docs as the source of truth—ask the user only when documentation is unclear or incomplete.
 - Surface undocumented gaps or inconsistencies you discover while implementing features.
 - Align component naming, user-facing labels, and validation messages with terminology used in the docs.

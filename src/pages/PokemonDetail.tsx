@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchPokemonDetails, fetchPokemonSpecies } from "../services/pokeapi";
+import { fetchPokemonDetails, fetchPokemonSpecies, getEvolutionChainData } from "../services/pokeapi";
 import { convertHeight, convertWeight, getEnglishDescription } from "../utils/pokemon";
-import type { Pokemon, PokemonSpecies } from "../types/pokemon";
+import EvolutionChain from "../components/EvolutionChain";
+import type { Pokemon, PokemonSpecies, EvolutionDisplayData } from "../types/pokemon";
 
 const PokemonDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [pokemon, setPokemon] = useState<Pokemon | null>(null);
     const [species, setSpecies] = useState<PokemonSpecies | null>(null);
+    const [evolutions, setEvolutions] = useState<EvolutionDisplayData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [evolutionLoading, setEvolutionLoading] = useState(false);
+    const [navigationLoading, setNavigationLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [evolutionError, setEvolutionError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadPokemonData = async () => {
@@ -28,6 +33,21 @@ const PokemonDetail: React.FC = () => {
 
                 setPokemon(pokemonData);
                 setSpecies(speciesData);
+
+                // Fetch evolution chain data after main data is loaded
+                setEvolutionLoading(true);
+                setEvolutionError(null);
+                try {
+                    const evolutionData = await getEvolutionChainData(speciesData);
+                    setEvolutions(evolutionData);
+                } catch (evolutionErr) {
+                    const evolutionErrorMessage = evolutionErr instanceof Error 
+                        ? evolutionErr.message 
+                        : "Unable to load evolution data";
+                    setEvolutionError(evolutionErrorMessage);
+                } finally {
+                    setEvolutionLoading(false);
+                }
             } catch (err) {
                 const errorMessage =
                     err instanceof Error ? err.message : "An error occurred while loading Pokémon";
@@ -42,6 +62,34 @@ const PokemonDetail: React.FC = () => {
 
     const handleBack = () => {
         navigate("/");
+    };
+
+    const handlePrevious = async () => {
+        if (!pokemon || pokemon.id <= 1 || navigationLoading) return;
+        
+        setNavigationLoading(true);
+        try {
+            navigate(`/pokemon/${pokemon.id - 1}`);
+        } catch (err) {
+            console.error("Navigation error:", err);
+        } finally {
+            // Navigation loading will be reset by the new component mount
+            setNavigationLoading(false);
+        }
+    };
+
+    const handleNext = async () => {
+        if (!pokemon || navigationLoading) return;
+        
+        setNavigationLoading(true);
+        try {
+            navigate(`/pokemon/${pokemon.id + 1}`);
+        } catch (err) {
+            console.error("Navigation error:", err);
+        } finally {
+            // Navigation loading will be reset by the new component mount
+            setNavigationLoading(false);
+        }
     };
 
     // Render loading state
@@ -76,9 +124,28 @@ const PokemonDetail: React.FC = () => {
         <div className="pokemon-detail-container">
             <h1>Pokédex</h1>
 
-            <button className="back-button" onClick={handleBack}>
-                ← Back to List
-            </button>
+            <div className="pokemon-detail-navigation">
+                <button className="back-button" onClick={handleBack}>
+                    ← Back to List
+                </button>
+                
+                <div className="pokemon-navigation-controls">
+                    <button 
+                        className="nav-button nav-previous" 
+                        onClick={handlePrevious}
+                        disabled={pokemon.id <= 1 || navigationLoading}
+                    >
+                        {navigationLoading ? "Loading..." : "← Previous"}
+                    </button>
+                    <button 
+                        className="nav-button nav-next" 
+                        onClick={handleNext}
+                        disabled={navigationLoading}
+                    >
+                        {navigationLoading ? "Loading..." : "Next →"}
+                    </button>
+                </div>
+            </div>
 
             <div className="pokemon-detail-card">
                 {/* High quality sprite */}
@@ -207,6 +274,13 @@ const PokemonDetail: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Evolution Chain */}
+            <EvolutionChain 
+                evolutions={evolutions}
+                loading={evolutionLoading}
+                error={evolutionError}
+            />
         </div>
     );
 };

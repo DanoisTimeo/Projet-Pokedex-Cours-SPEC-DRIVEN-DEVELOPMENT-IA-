@@ -1,7 +1,14 @@
 // PokeAPI service module
 // Based on specifications in docs/02-pokeapi.md
 
-import type { PokemonListResponse, Pokemon, PokemonSpecies } from "../types/pokemon";
+import type { 
+    PokemonListResponse, 
+    Pokemon, 
+    PokemonSpecies, 
+    EvolutionChain,
+    ChainNode,
+    EvolutionDisplayData
+} from "../types/pokemon";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
 
@@ -87,5 +94,93 @@ export async function fetchPokemonSpecies(idOrName: string | number): Promise<Po
             throw error;
         }
         throw new Error("Unknown error occurred while fetching Pokemon species");
+    }
+}
+
+/**
+ * Fetch evolution chain data
+ * @param evolutionChainUrl - URL to the evolution chain endpoint
+ * @returns Promise with evolution chain data
+ */
+export async function fetchEvolutionChain(evolutionChainUrl: string): Promise<EvolutionChain> {
+    try {
+        const response = await fetch(evolutionChainUrl);
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error("No evolution chain found");
+            }
+            throw new Error(
+                `Failed to fetch evolution chain: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const data: EvolutionChain = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Unknown error occurred while fetching evolution chain");
+    }
+}
+
+/**
+ * Collect all species names from evolution chain recursively
+ * @param chain - The evolution chain node
+ * @returns Array of species names
+ */
+export function collectEvolutionSpeciesNames(chain: ChainNode): string[] {
+    const names: string[] = [];
+    
+    function traverse(node: ChainNode) {
+        names.push(node.species.name);
+        node.evolves_to.forEach(evolution => traverse(evolution));
+    }
+    
+    traverse(chain);
+    return names;
+}
+
+/**
+ * Get complete evolution chain display data for a Pokemon
+ * @param speciesData - Pokemon species data containing evolution_chain URL
+ * @returns Promise with array of evolution display data
+ */
+export async function getEvolutionChainData(speciesData: PokemonSpecies): Promise<EvolutionDisplayData[]> {
+    try {
+        // Check if evolution chain exists
+        if (!speciesData.evolution_chain?.url) {
+            return [];
+        }
+
+        // Fetch evolution chain
+        const evolutionChain = await fetchEvolutionChain(speciesData.evolution_chain.url);
+        
+        // Collect species names
+        const speciesNames = collectEvolutionSpeciesNames(evolutionChain.chain);
+        
+        // If there's only one species (the Pokemon itself), return empty array
+        if (speciesNames.length <= 1) {
+            return [];
+        }
+        
+        // Fetch Pokemon data for each species to get images and IDs
+        const evolutionData = await Promise.all(
+            speciesNames.map(async (name) => {
+                const pokemon = await fetchPokemonDetails(name);
+                return {
+                    name: pokemon.name,
+                    id: pokemon.id,
+                    imageUrl: pokemon.sprites.other["official-artwork"].front_default
+                };
+            })
+        );
+
+        return evolutionData;
+    } catch (error) {
+        // Return empty array on error to not break the main detail page
+        console.error("Error fetching evolution chain:", error);
+        return [];
     }
 }
