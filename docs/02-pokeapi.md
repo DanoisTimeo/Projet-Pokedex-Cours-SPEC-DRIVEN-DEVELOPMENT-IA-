@@ -20,33 +20,33 @@ GET /pokemon/{id or name}
 
 **Example URLs:**
 
--   By ID: `https://pokeapi.co/api/v2/pokemon/1/`
--   By name: `https://pokeapi.co/api/v2/pokemon/bulbasaur/`
+- By ID: `https://pokeapi.co/api/v2/pokemon/1/`
+- By name: `https://pokeapi.co/api/v2/pokemon/bulbasaur/`
 
 ### Retrievable Data
 
 #### 1. Basic Information
 
--   **Name**: `name` (string)
--   **Image**: `sprites.front_default` (string, URL)
--   **High Quality Image**: `sprites.other['official-artwork'].front_default` (string, URL)
--   **Height**: `height` (number, in decimeters - divide by 10 to get meters)
--   **Weight**: `weight` (number, in hectograms - divide by 10 to get kg)
+- **Name**: `name` (string)
+- **Image**: `sprites.front_default` (string, URL)
+- **High Quality Image**: `sprites.other['official-artwork'].front_default` (string, URL)
+- **Height**: `height` (number, in decimeters - divide by 10 to get meters)
+- **Weight**: `weight` (number, in hectograms - divide by 10 to get kg)
 
 #### 2. Types
 
--   **Types**: `types[]` (array)
-    -   Path: `types[].type.name` (string)
-    -   Types are sorted by `slot` (1 = primary type, 2 = secondary type)
+- **Types**: `types[]` (array)
+    - Path: `types[].type.name` (string)
+    - Types are sorted by `slot` (1 = primary type, 2 = secondary type)
 
 #### 3. Base Statistics
 
--   **HP**: `stats[0].base_stat` (number)
--   **Attack**: `stats[1].base_stat` (number)
--   **Defense**: `stats[2].base_stat` (number)
--   **Special Attack**: `stats[3].base_stat` (number)
--   **Special Defense**: `stats[4].base_stat` (number)
--   **Speed**: `stats[5].base_stat` (number)
+- **HP**: `stats[0].base_stat` (number)
+- **Attack**: `stats[1].base_stat` (number)
+- **Defense**: `stats[2].base_stat` (number)
+- **Special Attack**: `stats[3].base_stat` (number)
+- **Special Defense**: `stats[4].base_stat` (number)
+- **Speed**: `stats[5].base_stat` (number)
 
 #### 4. Description
 
@@ -153,15 +153,15 @@ Used to retrieve the description and additional information about a Pokémon.
 
 **Example URLs:**
 
--   By ID: `https://pokeapi.co/api/v2/pokemon-species/1/`
--   By name: `https://pokeapi.co/api/v2/pokemon-species/bulbasaur/`
+- By ID: `https://pokeapi.co/api/v2/pokemon-species/1/`
+- By name: `https://pokeapi.co/api/v2/pokemon-species/bulbasaur/`
 
 ### Retrievable Data
 
--   **Description**: `flavor_text_entries[]` (array)
-    -   Filter by language: `flavor_text_entries[].language.name === "en"`
-    -   Text: `flavor_text_entries[].flavor_text` (string)
-    -   ⚠️ Replace `\f` characters with spaces
+- **Description**: `flavor_text_entries[]` (array)
+    - Filter by language: `flavor_text_entries[].language.name === "en"`
+    - Text: `flavor_text_entries[].flavor_text` (string)
+    - ⚠️ Replace `\f` characters with spaces
 
 ### Response Schema (simplified)
 
@@ -240,7 +240,7 @@ Use this endpoint to retrieve the full evolution chain for a species. The canoni
     - `evolution_details[].item` (item required)
     - `evolution_details[].trigger` (trigger type: level-up, trade, use-item, etc.)
     - other conditional fields (`gender`, `held_item`, `known_move`, `location`, `time_of_day`, `min_happiness`, `needs_overworld_rain`, ...)
-    We keep these fields documented here but they are not displayed in the current UI.
+      We keep these fields documented here but they are not displayed in the current UI.
 
 ### Recommended image/id retrieval (Option A - reliable)
 
@@ -256,9 +256,18 @@ Use this endpoint to retrieve the full evolution chain for a species. The canoni
         "species": { "name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon-species/1/" },
         "evolves_to": [
             {
-                "species": { "name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon-species/2/" },
+                "species": {
+                    "name": "ivysaur",
+                    "url": "https://pokeapi.co/api/v2/pokemon-species/2/"
+                },
                 "evolves_to": [
-                    { "species": { "name": "venusaur", "url": "https://pokeapi.co/api/v2/pokemon-species/3/" }, "evolves_to": [] }
+                    {
+                        "species": {
+                            "name": "venusaur",
+                            "url": "https://pokeapi.co/api/v2/pokemon-species/3/"
+                        },
+                        "evolves_to": []
+                    }
                 ]
             }
         ]
@@ -270,21 +279,163 @@ Use this endpoint to retrieve the full evolution chain for a species. The canoni
 
 ```javascript
 // 1. Get species to obtain evolution_chain URL
-const species = await fetch('https://pokeapi.co/api/v2/pokemon-species/bulbasaur/').then(r => r.json());
-const chain = await fetch(species.evolution_chain.url).then(r => r.json());
+const species = await fetch("https://pokeapi.co/api/v2/pokemon-species/bulbasaur/").then((r) =>
+    r.json(),
+);
+const chain = await fetch(species.evolution_chain.url).then((r) => r.json());
 
 // 2. Collect species names recursively
 function collectNames(node, list = []) {
     list.push(node.species.name);
-    (node.evolves_to || []).forEach(child => collectNames(child, list));
+    (node.evolves_to || []).forEach((child) => collectNames(child, list));
     return list;
 }
 const names = collectNames(chain.chain);
 
 // 3. For each name, call /pokemon/{name} to get images/ids
-const pokemons = await Promise.all(names.map(n => fetch(`https://pokeapi.co/api/v2/pokemon/${n}`).then(r => r.json())));
+const pokemons = await Promise.all(
+    names.map((n) => fetch(`https://pokeapi.co/api/v2/pokemon/${n}`).then((r) => r.json())),
+);
 ```
 
+## Generation List and Details
+
+### Endpoint: List All Generations
+
+GET /generation
+
+Returns a paginated list of all available generations in PokeAPI.
+
+**Example URL:**
+
+- `https://pokeapi.co/api/v2/generation`
+
+### Response Schema (simplified)
+
+```json
+{
+    "count": 9,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "name": "generation-i",
+            "url": "https://pokeapi.co/api/v2/generation/1/"
+        },
+        {
+            "name": "generation-ii",
+            "url": "https://pokeapi.co/api/v2/generation/2/"
+        },
+        {
+            "name": "generation-iii",
+            "url": "https://pokeapi.co/api/v2/generation/3/"
+        },
+        {
+            "name": "generation-iv",
+            "url": "https://pokeapi.co/api/v2/generation/4/"
+        },
+        {
+            "name": "generation-v",
+            "url": "https://pokeapi.co/api/v2/generation/5/"
+        },
+        {
+            "name": "generation-vi",
+            "url": "https://pokeapi.co/api/v2/generation/6/"
+        },
+        {
+            "name": "generation-vii",
+            "url": "https://pokeapi.co/api/v2/generation/7/"
+        },
+        {
+            "name": "generation-viii",
+            "url": "https://pokeapi.co/api/v2/generation/8/"
+        },
+        {
+            "name": "generation-ix",
+            "url": "https://pokeapi.co/api/v2/generation/9/"
+        }
+    ]
+}
+```
+
+---
+
+### Endpoint: Generation Details
+
+GET /generation/{id or name}
+
+Returns detailed information about a specific generation, including the Pokémon species introduced in that generation.
+
+**Example URLs:**
+
+- By ID: `https://pokeapi.co/api/v2/generation/1/`
+- By name: `https://pokeapi.co/api/v2/generation/generation-i/`
+
+### Retrievable Data
+
+- **ID**: `id` (number)
+- **Name**: `name` (string, format: "generation-i", "generation-ii", etc.)
+- **Main Region**: `main_region.name` (string)
+- **Pokémon Species**: `pokemon_species[]` (array of NamedAPIResource)
+    - Path: `pokemon_species[].name` (species name)
+    - Path: `pokemon_species[].url` (URL to pokemon-species endpoint)
+
+### Response Schema (simplified)
+
+```json
+{
+    "id": 1,
+    "name": "generation-i",
+    "abilities": [],
+    "main_region": {
+        "name": "kanto",
+        "url": "https://pokeapi.co/api/v2/region/1/"
+    },
+    "moves": [
+        {
+            "name": "pound",
+            "url": "https://pokeapi.co/api/v2/move/1/"
+        }
+    ],
+    "names": [
+        {
+            "name": "Generation I",
+            "language": {
+                "name": "en",
+                "url": "https://pokeapi.co/api/v2/language/9/"
+            }
+        }
+    ],
+    "pokemon_species": [
+        {
+            "name": "bulbasaur",
+            "url": "https://pokeapi.co/api/v2/pokemon-species/1/"
+        },
+        {
+            "name": "ivysaur",
+            "url": "https://pokeapi.co/api/v2/pokemon-species/2/"
+        },
+        {
+            "name": "venusaur",
+            "url": "https://pokeapi.co/api/v2/pokemon-species/3/"
+        }
+    ],
+    "types": [
+        {
+            "name": "normal",
+            "url": "https://pokeapi.co/api/v2/type/1/"
+        }
+    ],
+    "version_groups": [
+        {
+            "name": "red-blue",
+            "url": "https://pokeapi.co/api/v2/version-group/1/"
+        }
+    ]
+}
+```
+
+---
 
 ## Data Retrieval Guide
 

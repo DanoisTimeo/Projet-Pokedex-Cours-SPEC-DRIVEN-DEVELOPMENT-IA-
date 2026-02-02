@@ -218,6 +218,14 @@
     - [x] Test edge cases (ID 1, non-existent IDs)
     - [x] Validate smooth user experience
 
+### Documentation updates (Phase 2.0)
+
+- [x] Write docs/06-quiz-feature.md - Complete Quiz feature specification
+- [x] Update docs/02-pokeapi.md - Add generation endpoints and examples
+- [x] Update AGENT.md - Add reference to 06-quiz-feature.md
+
 ## In Progress
+
+- [] Write a development plan for the quiz
 
 ## Planned
