@@ -226,6 +226,82 @@
 
 ## In Progress
 
-- [] Write a development plan for the quiz
+### Phase 2.1: Quiz Infrastructure & Types
+
+- [ ] Create src/types/quiz.ts (QuizDifficulty, QuizLength, Generation, QuizConfig, QuestionType, Question, QuizSession, QuizAnswer, QuizResult)
+- [ ] Extend src/services/pokeapi.ts (fetchGenerationList, fetchGenerationDetails, caching)
+- [ ] Create src/utils/quiz.ts (weighted random, shuffle, filter duplicates, calculate score, filter English text)
+- [ ] Create src/services/quizService.ts (buildQuestionPool, generateQuestion, validateAnswer, caching)
 
 ## Planned
+
+### Phase 2.2: Quiz Setup Page
+
+- [ ] Create src/pages/QuizSetup.tsx
+- [ ] Difficulty selector (Normal, Hard, Expert)
+- [ ] Length selector (Quick, Short, Normal, Long, Sudden Death)
+- [ ] Generation selector (fetch, checkbox, validation)
+- [ ] Start button (build pool, navigate to /quiz/play)
+- [ ] Style to match Game Boy theme
+
+### Phase 2.3: Quiz Play Page
+
+- [ ] Create src/pages/QuizPlay.tsx with question loop
+- [ ] Create src/components/QuizTimer.tsx (countdown, auto-submit)
+- [ ] Create src/components/QuestionRenderer.tsx (dispatch to question types)
+- [ ] Implement 10 question type renderers (ImageToName, NameToImage, PokemonToType, DescriptionToPokemon, NumberToPokemon, PokemonToNumber, PreEvolutionToPokemon, PokemonToPostEvolution, HeightWeightToPokemon, StatsToPokemon)
+- [ ] Answer selection with confirmation button
+- [ ] Expert mode: "The answer is not here" button (10% correct, 90% decoy)
+- [ ] Feedback display (green ✅ / red ❌, correct: Q+A / incorrect: Q+user+correct)
+- [ ] Auto-advance (0 second delay)
+- [ ] Quit button with confirmation
+- [ ] Style to match Game Boy theme
+
+### Phase 2.4: Quiz Recap Page
+
+- [ ] Create src/pages/QuizRecap.tsx
+- [ ] Standard mode: "Score: X/Y (Z%)" + all questions in order
+- [ ] Sudden Death mode: "X Questions Correct" + only final question
+- [ ] Action buttons (Try Again, Change Quiz, Back to Pokédex)
+- [ ] Style to match Game Boy theme
+
+### Phase 2.5: Routing & Navigation
+
+- [ ] Update App.tsx with /quiz, /quiz/play, /quiz/recap routes
+- [ ] Add "Quiz" button to PokemonList page
+- [ ] Test navigation flows
+
+### Phase 2.6: Integration & Performance
+
+- [ ] Session-level caching (pre-load question pool Pokemon)
+- [ ] API call optimization (batch fetch, reuse cache)
+- [ ] Error handling (network errors, insufficient Pokemon, skip failed questions)
+- [ ] Performance testing (40-question quiz, multiple generations)
+
+### Phase 2.7: Styling & Polish
+
+- [ ] Game Boy theme consistency (Press Start 2P font, red/white colors)
+- [ ] Answer button styling (touch-friendly, visual feedback)
+- [ ] Responsive design for mobile
+- [ ] Color + icon feedback (not color-only)
+
+### Phase 2.8: Testing & Validation
+
+- [ ] Manual testing: Setup (difficulty, length, generations, validation)
+- [ ] Manual testing: Play (all 10 question types, timer, validation, quit)
+- [ ] Manual testing: Recap (scores, question display, buttons)
+- [ ] Edge cases (1 generation, all generations, Sudden Death, high IDs, network errors)
+- [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
+
+### Phase 2.9: Documentation & Cleanup
+
+- [ ] Add JSDoc comments to functions
+- [ ] Update README.md with Quiz feature
+- [ ] Remove debug code
+
+### Phase 2.10: Final Validation & Release
+
+- [ ] All tests passing
+- [ ] No console errors
+- [ ] Docker build works
+- [ ] Quiz feature complete per docs/06-quiz-feature.md
