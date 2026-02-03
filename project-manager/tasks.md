@@ -397,22 +397,51 @@
     - [x] Responsive design for mobile
     - [x] Pixel-art friendly image rendering
 
-## Planned
+### Phase 2.4: Quiz Recap Page - ✅ COMPLETED
 
-### Phase 2.4: Quiz Recap Page
-
-- [ ] Create src/pages/QuizRecap.tsx
-- [ ] Standard mode: "Score: X/Y (Z%)" + all questions in order
-- [ ] Sudden Death mode: "X Questions Correct" + only final question
-
-- [ ] Action buttons (Try Again, Change Quiz, Back to Pokédex)
-- [ ] Style to match Game Boy theme
+- [x] Create src/pages/QuizRecap.tsx
+    - [x] RecapQuestionDisplay sub-component for rendering all 10 question types
+    - [x] Load quizResult and quizQuestions from sessionStorage
+    - [x] Error handling for missing results
+    - [x] Functional recap component with full question display
+- [x] Standard mode: "Score: X/Y (Z%)" + all questions in order
+    - [x] Display score in "Score: X/Y (Z%)" format
+    - [x] Show all questions in answer order
+    - [x] Display each question with answer options and user's answer
+    - [x] Show correct answer with visual feedback
+- [x] Sudden Death mode: "X Questions Correct" + only final question
+    - [x] Display question count instead of percentage score
+    - [x] Show only the final (incorrect) question
+    - [x] Display attempt number for the failed question
+    - [x] Show previous attempts summary
+- [x] Action buttons (Try Again, Change Quiz, Back to Pokédex)
+    - [x] Three button set with appropriate labels per mode
+    - [x] Try Again: Clear session and restart with same config
+    - [x] Change Quiz: Return to QuizSetup to change settings
+    - [x] Back to Pokédex: Return to main Pokemon list
+    - [x] Buttons navigate correctly to appropriate routes
+- [x] Style to match Game Boy theme
+    - [x] Quiz recap container and header styling
+    - [x] Score display styling with color emphasis
+    - [x] Question card styling with numbered headers
+    - [x] Answer option styling with correct/incorrect states
+    - [x] Visual feedback icons (✓/✕) for answers
+    - [x] Button styling consistent with Game Boy theme
+    - [x] Responsive design for mobile
+    - [x] Pixel-art friendly image rendering
+- [x] Enhanced QuizPlay.tsx
+    - [x] Track questions in questionsAsked state array
+    - [x] Store questions in sessionStorage during gameplay
+    - [x] Update handleConfirmQuit to persist questions before navigation
+    - [x] Enable recap page to display full question context
 
 ### Phase 2.5: Routing & Navigation
 
 - [ ] Update App.tsx with /quiz, /quiz/play, /quiz/recap routes
 - [ ] Add "Quiz" button to PokemonList page
 - [ ] Test navigation flows
+
+## Planned
 
 ### Phase 2.6: Integration & Performance
 

@@ -26,6 +26,7 @@ const QuizPlay: React.FC = () => {
     const [error, setError] = useState<string>("");
     const [showQuitConfirm, setShowQuitConfirm] = useState(false);
     const [timerActive, setTimerActive] = useState(false);
+    const [questionsAsked, setQuestionsAsked] = useState<Question[]>([]);
 
     // Load quiz config and pool from sessionStorage
     useEffect(() => {
@@ -93,6 +94,7 @@ const QuizPlay: React.FC = () => {
             );
 
             setCurrentQuestion(question);
+            setQuestionsAsked(prev => [...prev, question]);
             setTimerActive(true);
         } catch (err) {
             const errorMessage =
@@ -223,6 +225,7 @@ const QuizPlay: React.FC = () => {
     const completeQuiz = (sess: QuizSession) => {
         const result = calculateQuizResult(sess);
         sessionStorage.setItem("quizResult", JSON.stringify(result));
+        sessionStorage.setItem("quizQuestions", JSON.stringify(questionsAsked));
         clearQuizCache();
         navigate("/quiz/recap");
     };
@@ -242,6 +245,7 @@ const QuizPlay: React.FC = () => {
         if (session) {
             const result = calculateQuizResult(session);
             sessionStorage.setItem("quizResult", JSON.stringify(result));
+            sessionStorage.setItem("quizQuestions", JSON.stringify(questionsAsked));
             clearQuizCache();
             navigate("/quiz/recap");
         }
