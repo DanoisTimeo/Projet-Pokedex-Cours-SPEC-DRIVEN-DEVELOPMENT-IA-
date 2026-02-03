@@ -224,8 +224,6 @@
 - [x] Update docs/02-pokeapi.md - Add generation endpoints and examples
 - [x] Update AGENT.md - Add reference to 06-quiz-feature.md
 
-## In Progress
-
 ### Phase 2.1: Quiz Infrastructure & Types - ✅ COMPLETED
 
 - [x] Create src/types/quiz.ts (QuizDifficulty, QuizLength, Generation, QuizConfig, QuestionType, Question, QuizSession, QuizAnswer, QuizResult)
@@ -496,29 +494,86 @@
     - [x] Created .answer-image-small class for number-to-pokemon display
     - [x] Allows dual display of image + label in answer options
 
-## Planned
+### Phase 2.6: Integration & Performance - ✅ COMPLETED
 
-### Phase 2.6: Integration & Performance
+- [x] Session-level caching (pre-load question pool Pokemon)
+    - [x] Added preloadPokemonPool function for batch pre-fetching
+    - [x] Cache tracks preloaded Pokemon with Set
+    - [x] Preloads configurable batch size (default: quiz length + 10)
+- [x] API call optimization (batch fetch, reuse cache)
+    - [x] Parallel fetching with Promise.allSettled (5 concurrent)
+    - [x] Progress callback for loading UI updates
+    - [x] Cache statistics function for debugging
+- [x] Error handling (network errors, insufficient Pokemon, skip failed questions)
+    - [x] Exponential backoff retry logic (max 3 retries)
+    - [x] Automatic question skip after max retries
+    - [x] Detailed loading messages during retries
+- [x] Performance testing (40-question quiz, multiple generations)
+    - [x] Preloading ensures faster question generation
+    - [x] Cache reuse reduces API calls
 
-- [ ] Session-level caching (pre-load question pool Pokemon)
-- [ ] API call optimization (batch fetch, reuse cache)
-- [ ] Error handling (network errors, insufficient Pokemon, skip failed questions)
-- [ ] Performance testing (40-question quiz, multiple generations)
+### Phase 2.7: Styling & Polish - ✅ COMPLETED
 
-### Phase 2.7: Styling & Polish
+- [x] Game Boy theme consistency (Press Start 2P font, red/white colors)
+    - [x] Consistent styling across all quiz components
+    - [x] Loading spinner with Game Boy red accent
+- [x] Answer button styling (touch-friendly, visual feedback)
+    - [x] Touch-friendly minimum sizes (44px+)
+    - [x] touch-action: manipulation for better mobile response
+    - [x] Box shadow feedback on hover/select
+    - [x] Active state with scale transform
+- [x] Responsive design for mobile
+    - [x] Breakpoints at 768px and 480px
+    - [x] Grid adjusts from 2-column to 1-column on small screens
+    - [x] Optimized button sizes and spacing for touch
+    - [x] Horizontal layout for answer buttons on extra small screens
+- [x] Color + icon feedback (not color-only)
+    - [x] Added ✓ icon for correct answers (green)
+    - [x] Added ✕ icon for incorrect answers (red)
+    - [x] Added ● icon for selected state (blue)
+    - [x] Added ⚠ icon for expert "answer not here" option (orange)
+    - [x] Icons positioned in top-right corner of buttons
 
-- [ ] Game Boy theme consistency (Press Start 2P font, red/white colors)
-- [ ] Answer button styling (touch-friendly, visual feedback)
-- [ ] Responsive design for mobile
-- [ ] Color + icon feedback (not color-only)
+### Phase 2.7.1: Quiz Recap Page Redesign - ✅ COMPLETED
+
+- [x] Redesigned recap question display with distinct block cards
+    - [x] Green bordered cards for correct answers
+    - [x] Red bordered cards for incorrect answers
+    - [x] Clear visual separation between questions
+- [x] Improved question display structure
+    - [x] Header with question number and status badge (✓ Correct / ✕ Incorrect)
+    - [x] Question text with Pokemon image when applicable
+    - [x] Extra info (description, number, stats, measurements) displayed inline
+- [x] Answer display with Pokemon cards style
+    - [x] PokemonAnswerCard component with image + name
+    - [x] Correct answers: only user's answer shown (green card)
+    - [x] Incorrect answers: user's answer + correct answer (red/green cards)
+    - [x] Cards styled like quiz option buttons for consistency
+- [x] Responsive design for recap
+    - [x] Stack layout on mobile
+    - [x] Adjusted image and text sizes for smaller screens
+
+### Phase 2.7.2: Quiz Recap Button Reorganization - ✅ COMPLETED
+
+- [x] Repositioned action buttons on recap page
+    - [x] Moved buttons to appear BEFORE the question details list
+    - [x] Buttons now positioned between score/config section and questions
+- [x] Updated button styling
+    - [x] "Change Quiz" and "Back to Pokédex" buttons now have blue text color (#0066cc)
+    - [x] Blue text darkens to #0052a3 on hover
+    - [x] "Try Again" button remains red (primary color)
 
 ### Phase 2.8: Testing & Validation
 
-- [ ] Manual testing: Setup (difficulty, length, generations, validation)
-- [ ] Manual testing: Play (all 10 question types, timer, validation, quit)
-- [ ] Manual testing: Recap (scores, question display, buttons)
-- [ ] Edge cases (1 generation, all generations, Sudden Death, high IDs, network errors)
-- [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
+- [x] Manual testing: Setup (difficulty, length, generations, validation)
+- [x] Manual testing: Play (all 10 question types, timer, validation, quit)
+- [x] Manual testing: Recap (scores, question display, buttons)
+- [x] Edge cases (1 generation, all generations, Sudden Death, high IDs, network errors)
+- [x] Cross-browser testing (Chrome, Firefox, Safari, Edge)
+
+## In Progress
+
+## Planned
 
 ### Phase 2.9: Documentation & Cleanup
 

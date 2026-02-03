@@ -42,6 +42,7 @@ class QuizServiceCache {
     private generationCache: Map<number, Generation> = new Map();
     private pokemonCache: Map<string, Pokemon> = new Map();
     private speciesCache: Map<string, PokemonSpecies> = new Map();
+    private preloadedPokemon: Set<string> = new Set();
 
     getGeneration(id: number): Generation | undefined {
         return this.generationCache.get(id);
@@ -57,6 +58,7 @@ class QuizServiceCache {
 
     setPokemon(nameOrId: string | number, pokemon: Pokemon): void {
         this.pokemonCache.set(String(nameOrId), pokemon);
+        this.preloadedPokemon.add(String(nameOrId));
     }
 
     getSpecies(nameOrId: string | number): PokemonSpecies | undefined {
@@ -67,14 +69,82 @@ class QuizServiceCache {
         this.speciesCache.set(String(nameOrId), species);
     }
 
+    isPokemonPreloaded(name: string): boolean {
+        return this.preloadedPokemon.has(name);
+    }
+
+    getPreloadedCount(): number {
+        return this.preloadedPokemon.size;
+    }
+
     clear(): void {
         this.generationCache.clear();
         this.pokemonCache.clear();
         this.speciesCache.clear();
+        this.preloadedPokemon.clear();
     }
 }
 
 const quizCache = new QuizServiceCache();
+
+// ============================================================================
+// PRELOADING & OPTIMIZATION
+// ============================================================================
+
+/**
+ * Preload Pokemon data for faster question generation
+ * Fetches a batch of Pokemon data in parallel to populate the cache
+ * @param pool - Array of Pokemon names to preload
+ * @param batchSize - Number of Pokemon to preload (default: 20 for a full quiz)
+ * @param onProgress - Optional callback for progress updates
+ * @returns Number of successfully preloaded Pokemon
+ */
+export async function preloadPokemonPool(
+    pool: string[],
+    batchSize: number = 20,
+    onProgress?: (loaded: number, total: number) => void
+): Promise<number> {
+    // Select random Pokemon to preload (we don't know which will be used)
+    const toPreload = shuffle([...pool]).slice(0, Math.min(batchSize, pool.length));
+    let loadedCount = 0;
+
+    // Batch fetch in groups of 5 for optimal performance
+    const CONCURRENT_LIMIT = 5;
+    
+    for (let i = 0; i < toPreload.length; i += CONCURRENT_LIMIT) {
+        const batch = toPreload.slice(i, i + CONCURRENT_LIMIT);
+        
+        const results = await Promise.allSettled(
+            batch.map(async (name) => {
+                if (!quizCache.isPokemonPreloaded(name)) {
+                    const pokemon = await fetchPokemonDetails(name);
+                    quizCache.setPokemon(name, pokemon);
+                    return true;
+                }
+                return true;
+            })
+        );
+
+        loadedCount += results.filter(r => r.status === "fulfilled").length;
+        
+        if (onProgress) {
+            onProgress(loadedCount, toPreload.length);
+        }
+    }
+
+    return loadedCount;
+}
+
+/**
+ * Get cache statistics for debugging
+ */
+export function getCacheStats(): { pokemon: number; species: number; generations: number } {
+    return {
+        pokemon: quizCache.getPreloadedCount(),
+        species: 0, // Not tracked
+        generations: 0 // Not tracked
+    };
+}
 
 // ============================================================================
 // QUESTION POOL BUILDING

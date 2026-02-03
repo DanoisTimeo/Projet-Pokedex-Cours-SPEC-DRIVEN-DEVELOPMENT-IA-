@@ -1633,36 +1633,79 @@ input {
     font-size: 0.7rem;
     border-radius: 0;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.15s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     min-height: 100px;
     justify-content: center;
+    position: relative;
+    /* Touch-friendly sizing */
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .answer-button:hover:not(:disabled) {
     background-color: #f0f0f0;
-    transform: scale(1.05);
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.answer-button:active:not(:disabled) {
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
 .answer-button.selected {
     background-color: #e8f4f8;
     border-color: #0066cc;
     border-width: 4px;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+}
+
+.answer-button.selected::before {
+    content: "●";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #0066cc;
+    font-size: 0.8rem;
 }
 
 .answer-button.correct {
     background-color: #d4edda;
     border-color: #28a745;
+    border-width: 4px;
     color: #155724;
+}
+
+.answer-button.correct::before {
+    content: "✓";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #28a745;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .answer-button.incorrect {
     background-color: #f8d7da;
     border-color: #e63946;
+    border-width: 4px;
     color: #721c24;
+}
+
+.answer-button.incorrect::before {
+    content: "✕";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #e63946;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .answer-button:disabled {
@@ -1676,9 +1719,19 @@ input {
     grid-column: span 1;
 }
 
+.answer-button.expert-button::after {
+    content: "⚠";
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    color: #ff8c00;
+    font-size: 0.7rem;
+}
+
 .answer-button.expert-button.selected {
     border-width: 4px;
     background-color: #ffe8cc;
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
 }
 
 .answer-button.expert-button.correct {
@@ -1687,10 +1740,30 @@ input {
     color: #155724;
 }
 
+.answer-button.expert-button.correct::before {
+    content: "✓";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #28a745;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
 .answer-button.expert-button.incorrect {
     background-color: #f8d7da;
     border-color: #e63946;
     color: #721c24;
+}
+
+.answer-button.expert-button.incorrect::before {
+    content: "✕";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: #e63946;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .answer-content {
@@ -1744,35 +1817,46 @@ input {
     font-size: 0.8rem;
     border-radius: 0;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.15s ease;
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
     display: block;
+    /* Touch-friendly */
+    min-height: 50px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .confirm-answer-button:hover:not(:disabled) {
     background-color: #d62828;
-    transform: scale(1.05);
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .confirm-answer-button:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
 .confirm-answer-button:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    background-color: #999;
 }
 
 /* Feedback Indicator */
 .feedback-indicator {
     text-align: center;
-    padding: 15px;
-    font-size: 0.9rem;
+    padding: 20px;
+    font-size: 1rem;
     border-radius: 0;
     font-weight: bold;
     margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 .feedback-correct {
@@ -1879,28 +1963,52 @@ input {
 
     .quiz-question-indicator {
         width: 100%;
+        font-size: 0.7rem;
     }
 
     .quiz-timer,
     .quit-button {
         width: 100%;
+        min-height: 48px;
     }
 
     .answer-options {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
 
     .answer-button {
-        min-height: 80px;
+        min-height: 90px;
+        padding: 12px 8px;
+        font-size: 0.6rem;
+    }
+
+    .answer-button::before {
+        font-size: 0.9rem !important;
     }
 
     .answer-image {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
 
     .question-stats {
         grid-template-columns: 1fr;
+    }
+
+    .confirm-answer-button {
+        max-width: 100%;
+        font-size: 0.75rem;
+        padding: 12px 20px;
+    }
+
+    .question-image {
+        max-width: 120px;
+        max-height: 120px;
+    }
+
+    .question-text {
+        font-size: 0.7rem;
     }
 
     .quiz-modal {
@@ -1918,14 +2026,97 @@ input {
     }
 }
 
+/* Extra small screens */
+@media (max-width: 480px) {
+    .answer-options {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .answer-button {
+        min-height: 70px;
+        padding: 10px;
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .answer-button .answer-image {
+        width: 45px;
+        height: 45px;
+    }
+
+    .answer-button .answer-label {
+        font-size: 0.6rem;
+    }
+
+    .quiz-question-indicator {
+        font-size: 0.6rem;
+    }
+
+    .timer-display {
+        font-size: 0.9rem;
+    }
+
+    .question-number {
+        font-size: 2rem;
+        padding: 15px 10px;
+        min-width: 100px;
+    }
+
+    .loading-indicator {
+        padding: 20px;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+    }
+
+    .loading-message {
+        font-size: 0.7rem;
+    }
+}
+
 /* ============================= */
 /* QUIZ RECAP PAGE STYLING      */
 /* ============================= */
 
+/* Loading Indicator for Quiz */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+    min-height: 200px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f0f0f0;
+    border-top: 5px solid #e63946;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-message {
+    font-size: 0.8rem;
+    color: #333;
+    text-align: center;
+    line-height: 1.6;
+}
+
 .quiz-recap-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 .quiz-recap-header {
@@ -1934,76 +2125,310 @@ input {
     padding-bottom: 20px;
     background-color: #f8f9fa;
     padding: 20px 15px 20px 15px;
-    border-radius: 8px;
+    border-radius: 0;
+    border: 3px solid #333;
 }
 
-.quiz-recap-header h2 {
-    font-size: 24px;
+.quiz-recap-header h1 {
+    font-size: 1rem;
     color: #333;
     margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.recap-score-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recap-score {
+    font-size: 1.2rem;
+    color: #e63946;
+    font-weight: bold;
     line-height: 1.4;
 }
 
-.quiz-recap-score {
-    font-size: 32px;
-    color: #e63946;
-    font-weight: bold;
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.quiz-recap-percentage {
-    font-size: 16px;
+.recap-config-summary {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 0.65rem;
     color: #666;
-    margin-bottom: 5px;
+    margin-top: 10px;
 }
 
-.quiz-recap-mode {
-    font-size: 12px;
-    color: #999;
-    font-style: italic;
-}
-
-.quiz-recap-content {
+.recap-questions-section {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.quiz-recap-question {
-    background-color: #ffffff;
+/* ============================= */
+/* QUESTION BLOCK CARDS          */
+/* ============================= */
+
+.recap-question-block {
+    border: 4px solid #333;
+    border-radius: 0;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.recap-question-block--correct {
+    border-color: #28a745;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.recap-question-block--incorrect {
+    border-color: #e63946;
+    box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+}
+
+.recap-question-block__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f5f5f5;
+    border-bottom: 3px solid #333;
+}
+
+.recap-question-block--correct .recap-question-block__header {
+    background-color: #d4edda;
+    border-bottom-color: #28a745;
+}
+
+.recap-question-block--incorrect .recap-question-block__header {
+    background-color: #f8d7da;
+    border-bottom-color: #e63946;
+}
+
+.recap-question-block__number {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.recap-question-block__status {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 0;
+    border: 2px solid;
+}
+
+.status--correct {
+    background-color: #28a745;
+    color: #fff;
+    border-color: #1e7e34;
+}
+
+.status--incorrect {
+    background-color: #e63946;
+    color: #fff;
+    border-color: #c82333;
+}
+
+.recap-question-block__question {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+    background-color: #fafafa;
+    border-bottom: 2px dashed #ddd;
+}
+
+.recap-question-block__text {
+    font-size: 0.75rem;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.recap-question-block__image {
+    max-width: 120px;
+    max-height: 120px;
+    image-rendering: pixelated;
     border: 3px solid #333;
-    border-radius: 8px;
+    background-color: #fff;
+}
+
+/* Question Extras (description, number, stats) */
+.recap-question-extra {
+    font-size: 0.65rem;
+    color: #333;
+    padding: 10px 15px;
+    background-color: #fff;
+    border: 2px solid #e63946;
+    width: 100%;
+    max-width: 350px;
+}
+
+.recap-question-extra--description {
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.recap-question-extra--number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e63946;
+    border: 3px solid #333;
+    padding: 10px 20px;
+}
+
+.recap-question-extra--measurements {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.recap-question-extra--stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: left;
+}
+
+.recap-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 8px;
+    background-color: #f0f0f0;
+    border-left: 3px solid #e63946;
+    font-size: 0.6rem;
+}
+
+/* Answer Section */
+.recap-question-block__answers {
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    background-color: #fff;
 }
 
-.quiz-recap-question:nth-child(even) {
+.recap-answer-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recap-answer-row__label {
+    font-size: 0.65rem;
+    color: #666;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Pokemon Answer Card - Styled like quiz option buttons */
+.pokemon-answer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 3px solid #333;
+    min-width: 120px;
+    max-width: 180px;
+}
+
+.pokemon-answer-card--correct {
+    background-color: #d4edda;
+    border-color: #28a745;
+}
+
+.pokemon-answer-card--incorrect {
+    background-color: #f8d7da;
+    border-color: #e63946;
+}
+
+.pokemon-answer-card__image {
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated;
+    border: 2px solid #333;
+    background-color: #fff;
+}
+
+.pokemon-answer-card__name {
+    font-size: 0.65rem;
+    color: #333;
+    text-transform: capitalize;
+    text-align: center;
+    line-height: 1.4;
+    font-weight: bold;
+}
+
+.pokemon-answer-card--correct .pokemon-answer-card__name {
+    color: #155724;
+}
+
+.pokemon-answer-card--incorrect .pokemon-answer-card__name {
+    color: #721c24;
+}
+
+/* Action Buttons */
+.recap-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 10px;
+    border-top: 3px solid #333;
+}
+
+.recap-button {
+    background-color: #fff;
+    color: #333;
+    border: 3px solid #333;
+    padding: 12px 20px;
+    font-size: 0.7rem;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-width: 140px;
+    text-align: center;
+    touch-action: manipulation;
+}
+
+.recap-button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.recap-button:active {
+    transform: scale(0.98);
+}
+
+.recap-button.primary {
+    background-color: #e63946;
+    color: #fff;
+}
+
+.recap-button.primary:hover {
+    background-color: #d62828;
+}
+
+.recap-button.secondary {
     background-color: #f8f9fa;
 }
 
-.question-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 3px solid #e63946;
-    padding-bottom: 12px;
+.recap-button.secondary:hover {
+    background-color: #e9ecef;
 }
 
-.question-number {
-    background-color: #e63946;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    flex-shrink: 0;
+.recap-button.secondary-blue {
+    color: #0066cc;
+}
+
+.recap-button.secondary-blue:hover {
+    color: #0052a3;
 }
 
 .question-text {
@@ -2245,56 +2670,82 @@ input {
         padding: 15px;
     }
 
-    .quiz-recap-score {
-        font-size: 28px;
+    .quiz-recap-header h1 {
+        font-size: 0.85rem;
     }
 
-    .quiz-recap-header h2 {
-        font-size: 18px;
+    .recap-score {
+        font-size: 1rem;
     }
 
-    .question-header {
+    .recap-config-summary {
         flex-direction: column;
+        gap: 8px;
+    }
+
+    .recap-question-block__header {
+        flex-direction: column;
+        gap: 10px;
         align-items: flex-start;
     }
 
-    .question-type-badge {
-        align-self: flex-start;
-    }
-
-    .question-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .recap-buttons {
-        grid-template-columns: 1fr;
-    }
-
-    .recap-buttons-full {
-        grid-template-columns: 1fr;
-    }
-
-    .question-image {
-        max-width: 100%;
-    }
-
-    .answer-option-recap {
-        flex-wrap: wrap;
-    }
-
-    .answer-option-image {
-        width: 45px;
-        height: 45px;
-    }
-
-    .quiz-recap-question {
+    .recap-question-block__question {
         padding: 15px;
     }
 
+    .recap-question-block__image {
+        max-width: 100px;
+        max-height: 100px;
+    }
+
+    .recap-question-extra--stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .recap-question-block__answers {
+        padding: 15px;
+    }
+
+    .pokemon-answer-card {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .pokemon-answer-card__image {
+        width: 70px;
+        height: 70px;
+    }
+
+    .recap-actions {
+        flex-direction: column;
+    }
+
     .recap-button {
-        min-height: 50px;
-        padding: 12px;
-        font-size: 11px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .recap-question-block__text {
+        font-size: 0.65rem;
+    }
+
+    .recap-question-extra--stats {
+        grid-template-columns: 1fr;
+    }
+
+    .pokemon-answer-card__image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .pokemon-answer-card__name {
+        font-size: 0.6rem;
+    }
+
+    .recap-button {
+        font-size: 0.65rem;
+        padding: 10px 15px;
     }
 }
 

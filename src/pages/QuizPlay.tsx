@@ -7,7 +7,8 @@ import {
     createQuizSession,
     recordAnswer,
     calculateQuizResult,
-    clearQuizCache
+    clearQuizCache,
+    preloadPokemonPool
 } from "../services/quizService";
 import { selectRandomQuestionType, getTimeLimitForQuestion } from "../utils/quiz";
 import QuizTimer from "../components/QuizTimer";
@@ -23,48 +24,65 @@ const QuizPlay: React.FC = () => {
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadingMessage, setLoadingMessage] = useState<string>("Loading quiz...");
     const [error, setError] = useState<string>("");
     const [showQuitConfirm, setShowQuitConfirm] = useState(false);
     const [timerActive, setTimerActive] = useState(false);
     const [questionsAsked, setQuestionsAsked] = useState<Question[]>([]);
+    const [retryCount, setRetryCount] = useState(0);
+    const MAX_RETRIES = 3;
 
     // Load quiz config and pool from sessionStorage
     useEffect(() => {
-        try {
-            const configStr = sessionStorage.getItem("quizConfig");
-            const poolStr = sessionStorage.getItem("quizPool");
+        const initQuiz = async () => {
+            try {
+                const configStr = sessionStorage.getItem("quizConfig");
+                const poolStr = sessionStorage.getItem("quizPool");
 
-            if (!configStr || !poolStr) {
-                setError("Quiz configuration not found. Please start a new quiz.");
+                if (!configStr || !poolStr) {
+                    setError("Quiz configuration not found. Please start a new quiz.");
+                    setIsLoading(false);
+                    return;
+                }
+
+                const config: QuizConfig = JSON.parse(configStr);
+                const pool: string[] = JSON.parse(poolStr);
+
+                setQuizPool(pool);
+
+                // Preload Pokemon data for better performance
+                setLoadingMessage("Preparing Pokémon data...");
+                const preloadCount = getQuestionCount(config.length) === Infinity ? 20 : getQuestionCount(config.length);
+                await preloadPokemonPool(pool, preloadCount + 10, (loaded, total) => {
+                    setLoadingMessage(`Loading Pokémon... ${loaded}/${total}`);
+                });
+
+                // Create quiz session
+                const newSession = createQuizSession(config);
+                setSession(newSession);
+
+                // Load first question
+                setLoadingMessage("Loading first question...");
+                loadQuestion(newSession, pool);
+            } catch (err) {
+                setError("Failed to load quiz configuration. Please start a new quiz.");
+                console.error("Error loading quiz:", err);
                 setIsLoading(false);
-                return;
             }
-
-            const config: QuizConfig = JSON.parse(configStr);
-            const pool: string[] = JSON.parse(poolStr);
-
-            setQuizPool(pool);
-
-            // Create quiz session
-            const newSession = createQuizSession(config);
-            setSession(newSession);
-
-            // Load first question
-            loadQuestion(newSession, pool);
-        } catch (err) {
-            setError("Failed to load quiz configuration. Please start a new quiz.");
-            console.error("Error loading quiz:", err);
-        }
+        };
+        
+        initQuiz();
     }, []);
 
     /**
      * Load the next question
      */
-    const loadQuestion = async (sess: QuizSession, pool: string[]) => {
+    const loadQuestion = async (sess: QuizSession, pool: string[], currentRetry: number = 0) => {
         try {
             setIsLoading(true);
             setSelectedAnswerId(null);
             setShowFeedback(false);
+            setLoadingMessage("Loading question...");
 
             // Determine max questions
             const maxQuestions =
@@ -96,6 +114,7 @@ const QuizPlay: React.FC = () => {
             setCurrentQuestion(question);
             setQuestionsAsked(prev => [...prev, question]);
             setTimerActive(true);
+            setRetryCount(0); // Reset retry count on success
         } catch (err) {
             const errorMessage =
                 err instanceof Error
@@ -104,13 +123,23 @@ const QuizPlay: React.FC = () => {
 
             console.error("Error loading question:", err);
 
-            // Skip this question and try next one
-            if ((err as any).code === "QUESTION_LOAD_FAILED") {
+            // Retry logic with exponential backoff
+            if (currentRetry < MAX_RETRIES) {
+                const delay = Math.min(500 * Math.pow(2, currentRetry), 2000);
+                setLoadingMessage(`Retrying... (${currentRetry + 1}/${MAX_RETRIES})`);
                 setTimeout(() => {
-                    loadQuestion(sess, pool);
-                }, 500);
+                    loadQuestion(sess, pool, currentRetry + 1);
+                }, delay);
             } else {
-                setError(errorMessage);
+                // Max retries reached - skip to next question or show error
+                if ((err as any).code === "QUESTION_LOAD_FAILED" || (err as any).code === "INSUFFICIENT_POKEMON") {
+                    setLoadingMessage("Skipping problematic question...");
+                    setTimeout(() => {
+                        loadQuestion(sess, pool, 0);
+                    }, 300);
+                } else {
+                    setError(`Unable to load question: ${errorMessage}. Please try again.`);
+                }
             }
         } finally {
             setIsLoading(false);
@@ -265,7 +294,10 @@ const QuizPlay: React.FC = () => {
         return (
             <div className="quiz-play-container">
                 <div className="quiz-play-content">
-                    <p className="loading-message">Loading first question...</p>
+                    <div className="loading-indicator">
+                        <div className="loading-spinner"></div>
+                        <p className="loading-message">{loadingMessage}</p>
+                    </div>
                 </div>
             </div>
         );

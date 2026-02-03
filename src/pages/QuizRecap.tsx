@@ -8,227 +8,191 @@ interface RecapQuestionDisplayProps {
     question: any;
 }
 
+/**
+ * Component to display a Pokemon answer in card style (image + name)
+ */
+const PokemonAnswerCard: React.FC<{
+    label: string;
+    image?: string;
+    variant?: "correct" | "incorrect" | "neutral";
+}> = ({ label, image, variant = "neutral" }) => {
+    const variantClass = variant === "correct" 
+        ? "pokemon-answer-card--correct" 
+        : variant === "incorrect" 
+            ? "pokemon-answer-card--incorrect" 
+            : "";
+
+    return (
+        <div className={`pokemon-answer-card ${variantClass}`}>
+            {image && (
+                <img
+                    src={image}
+                    alt={label}
+                    className="pokemon-answer-card__image"
+                />
+            )}
+            <span className="pokemon-answer-card__name">{label}</span>
+        </div>
+    );
+};
+
 const RecapQuestionDisplay: React.FC<RecapQuestionDisplayProps> = ({
     questionIndex,
     answer,
     question
 }) => {
-    const renderQuestionContent = () => {
-        const data = question.questionData;
-
-        switch (question.type) {
-            case "image-to-name":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">What is this Pokémon?</p>
-                        {data.image && (
-                            <img
-                                src={data.image}
-                                alt="Pokemon"
-                                className="recap-question-image"
-                            />
-                        )}
-                    </div>
-                );
-
-            case "name-to-image":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">
-                            Which sprite belongs to {data.name}?
-                        </p>
-                    </div>
-                );
-
-            case "pokemon-to-type":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">What type(s) is this Pokémon?</p>
-                        {data.image && (
-                            <img
-                                src={data.image}
-                                alt="Pokemon"
-                                className="recap-question-image"
-                            />
-                        )}
-                        <p className="recap-question-subtitle">{data.name}</p>
-                    </div>
-                );
-
-            case "description-to-pokemon":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">Which Pokémon is described as:</p>
-                        <div className="recap-question-description">
-                            {data.description}
-                        </div>
-                    </div>
-                );
-
-            case "number-to-pokemon":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">Which Pokémon has this number?</p>
-                        <div className="recap-question-number">{data.number}</div>
-                    </div>
-                );
-
-            case "pokemon-to-number":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">What is this Pokémon's number?</p>
-                        {data.image && (
-                            <img
-                                src={data.image}
-                                alt="Pokemon"
-                                className="recap-question-image"
-                            />
-                        )}
-                        <p className="recap-question-subtitle">{data.name}</p>
-                    </div>
-                );
-
-            case "pre-evolution-to-pokemon":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">
-                            Who evolves into {data.pokemonName}?
-                        </p>
-                        {data.image && (
-                            <img
-                                src={data.image}
-                                alt="Pokemon"
-                                className="recap-question-image"
-                            />
-                        )}
-                    </div>
-                );
-
-            case "pokemon-to-post-evolution":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">
-                            What does this Pokémon evolve into?
-                        </p>
-                        {data.image && (
-                            <img
-                                src={data.image}
-                                alt="Pokemon"
-                                className="recap-question-image"
-                            />
-                        )}
-                        <p className="recap-question-subtitle">{data.name}</p>
-                    </div>
-                );
-
-            case "height-weight-to-pokemon":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">
-                            Which Pokémon has these measurements?
-                        </p>
-                        <div className="recap-question-measurements">
-                            <div>Height: {data.height}</div>
-                            <div>Weight: {data.weight}</div>
-                        </div>
-                    </div>
-                );
-
-            case "stats-to-pokemon":
-                return (
-                    <div className="recap-question-content">
-                        <p className="recap-question-text">Which Pokémon has these stats?</p>
-                        <div className="recap-question-stats">
-                            <div className="recap-stat-row">
-                                <span>hp:</span>
-                                <span>{data.hp}</span>
-                            </div>
-                            <div className="recap-stat-row">
-                                <span>atk:</span>
-                                <span>{data.attack}</span>
-                            </div>
-                            <div className="recap-stat-row">
-                                <span>def:</span>
-                                <span>{data.defense}</span>
-                            </div>
-                            <div className="recap-stat-row">
-                                <span>sp.atk:</span>
-                                <span>{data.spAtk}</span>
-                            </div>
-                            <div className="recap-stat-row">
-                                <span>sp.def:</span>
-                                <span>{data.spDef}</span>
-                            </div>
-                            <div className="recap-stat-row">
-                                <span>speed:</span>
-                                <span>{data.speed}</span>
-                            </div>
-                        </div>
-                    </div>
-                );
-
-            default:
-                return <div className="recap-question-content">Unknown question type</div>;
-        }
-    };
-
-    const findOptionDisplay = (optionValue: string) => {
-        const option = question.options.find(
-            (opt: any) => opt.value === optionValue
-        );
-
-        if (option?.displayData?.image) {
-            return (
-                <div className="recap-answer-with-image">
-                    <img
-                        src={option.displayData.image}
-                        alt="Answer"
-                        className="recap-answer-image"
-                    />
-                    <span>{option.label}</span>
-                </div>
-            );
-        }
-
-        return <span>{option?.label || optionValue}</span>;
-    };
-
     const isCorrect = answer.isCorrect;
 
+    // Get question text based on type
+    const getQuestionText = () => {
+        switch (question.type) {
+            case "image-to-name":
+                return "What is this Pokémon?";
+            case "name-to-image":
+                return `Which sprite belongs to ${question.questionData?.name}?`;
+            case "pokemon-to-type":
+                return `What type(s) is ${question.questionData?.name}?`;
+            case "description-to-pokemon":
+                return "Which Pokémon is described as:";
+            case "number-to-pokemon":
+                return "Which Pokémon has this number?";
+            case "pokemon-to-number":
+                return `What is ${question.questionData?.name}'s number?`;
+            case "pre-evolution-to-pokemon":
+                return `Who evolves into ${question.questionData?.pokemonName}?`;
+            case "pokemon-to-post-evolution":
+                return `What does ${question.questionData?.name} evolve into?`;
+            case "height-weight-to-pokemon":
+                return "Which Pokémon has these measurements?";
+            case "stats-to-pokemon":
+                return "Which Pokémon has these stats?";
+            default:
+                return "Question";
+        }
+    };
+
+    // Get question image if applicable
+    const getQuestionImage = () => {
+        const data = question.questionData;
+        switch (question.type) {
+            case "image-to-name":
+            case "pokemon-to-type":
+            case "pokemon-to-number":
+            case "pre-evolution-to-pokemon":
+            case "pokemon-to-post-evolution":
+                return data?.image;
+            default:
+                return null;
+        }
+    };
+
+    // Get additional question info (description, number, stats, etc.)
+    const renderQuestionExtras = () => {
+        const data = question.questionData;
+        
+        switch (question.type) {
+            case "description-to-pokemon":
+                return (
+                    <div className="recap-question-extra recap-question-extra--description">
+                        {data?.description}
+                    </div>
+                );
+            case "number-to-pokemon":
+                return (
+                    <div className="recap-question-extra recap-question-extra--number">
+                        {data?.number}
+                    </div>
+                );
+            case "height-weight-to-pokemon":
+                return (
+                    <div className="recap-question-extra recap-question-extra--measurements">
+                        <span>Height: {data?.height}</span>
+                        <span>Weight: {data?.weight}</span>
+                    </div>
+                );
+            case "stats-to-pokemon":
+                return (
+                    <div className="recap-question-extra recap-question-extra--stats">
+                        <div className="recap-stat"><span>hp:</span> <strong>{data?.hp}</strong></div>
+                        <div className="recap-stat"><span>atk:</span> <strong>{data?.attack}</strong></div>
+                        <div className="recap-stat"><span>def:</span> <strong>{data?.defense}</strong></div>
+                        <div className="recap-stat"><span>sp.atk:</span> <strong>{data?.spAtk}</strong></div>
+                        <div className="recap-stat"><span>sp.def:</span> <strong>{data?.spDef}</strong></div>
+                        <div className="recap-stat"><span>speed:</span> <strong>{data?.speed}</strong></div>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // Find option data by value
+    const findOption = (optionValue: string) => {
+        return question.options?.find((opt: any) => opt.value === optionValue);
+    };
+
+    const userOption = findOption(answer.selectedAnswerId?.replace("opt-", "")) 
+        || findOption(answer.selectedAnswerId);
+    const correctOption = findOption(answer.correctAnswerId?.replace("opt-", ""))
+        || findOption(answer.correctAnswerId);
+
+    const questionImage = getQuestionImage();
+
     return (
-        <div className="recap-question-card">
-            <div className="recap-question-number">
-                Question {questionIndex + 1}
+        <div className={`recap-question-block ${isCorrect ? "recap-question-block--correct" : "recap-question-block--incorrect"}`}>
+            {/* Question Header */}
+            <div className="recap-question-block__header">
+                <span className="recap-question-block__number">Q{questionIndex + 1}</span>
+                <span className={`recap-question-block__status ${isCorrect ? "status--correct" : "status--incorrect"}`}>
+                    {isCorrect ? "✓ Correct" : "✕ Incorrect"}
+                </span>
             </div>
 
-            {renderQuestionContent()}
+            {/* Question Content */}
+            <div className="recap-question-block__question">
+                <p className="recap-question-block__text">{getQuestionText()}</p>
+                
+                {questionImage && (
+                    <img
+                        src={questionImage}
+                        alt="Question Pokemon"
+                        className="recap-question-block__image"
+                    />
+                )}
 
-            <div className="recap-answer-section">
+                {renderQuestionExtras()}
+            </div>
+
+            {/* Answer Section */}
+            <div className="recap-question-block__answers">
                 {isCorrect ? (
-                    // Show only correct answer for correct responses
-                    <div className="recap-answer-result correct">
-                        <span className="recap-answer-icon">✓</span>
-                        <div className="recap-answer-content">
-                            <p className="recap-answer-label">Correct Answer:</p>
-                            {findOptionDisplay(answer.correctAnswerId)}
-                        </div>
+                    // Correct: Show only user's answer
+                    <div className="recap-answer-row">
+                        <span className="recap-answer-row__label">Your answer:</span>
+                        <PokemonAnswerCard
+                            label={userOption?.label || answer.selectedAnswerId}
+                            image={userOption?.displayData?.image}
+                            variant="correct"
+                        />
                     </div>
                 ) : (
-                    // Show both user's answer and correct answer for incorrect responses
+                    // Incorrect: Show user's answer + correct answer
                     <>
-                        <div className="recap-answer-result incorrect">
-                            <span className="recap-answer-icon">✕</span>
-                            <div className="recap-answer-content">
-                                <p className="recap-answer-label">Your Answer:</p>
-                                {findOptionDisplay(answer.selectedAnswerId)}
-                            </div>
+                        <div className="recap-answer-row">
+                            <span className="recap-answer-row__label">Your answer:</span>
+                            <PokemonAnswerCard
+                                label={userOption?.label || answer.selectedAnswerId || "No answer"}
+                                image={userOption?.displayData?.image}
+                                variant="incorrect"
+                            />
                         </div>
-                        <div className="recap-answer-result correct">
-                            <span className="recap-answer-icon">✓</span>
-                            <div className="recap-answer-content">
-                                <p className="recap-answer-label">Correct Answer:</p>
-                                {findOptionDisplay(answer.correctAnswerId)}
-                            </div>
+                        <div className="recap-answer-row">
+                            <span className="recap-answer-row__label">Correct answer:</span>
+                            <PokemonAnswerCard
+                                label={correctOption?.label || answer.correctAnswerId}
+                                image={correctOption?.displayData?.image}
+                                variant="correct"
+                            />
                         </div>
                     </>
                 )}
@@ -339,6 +303,53 @@ const QuizRecap: React.FC = () => {
                 </div>
             </div>
 
+            {/* Action Buttons */}
+            <div className="recap-actions">
+                {isSuddenDeath ? (
+                    <>
+                        <button
+                            className="recap-button primary"
+                            onClick={handleTryAgain}
+                        >
+                            Try Again Sudden Death
+                        </button>
+                        <button
+                            className="recap-button secondary secondary-blue"
+                            onClick={handleChangeQuiz}
+                        >
+                            Change Quiz
+                        </button>
+                        <button
+                            className="recap-button secondary secondary-blue"
+                            onClick={handleBackToPokédex}
+                        >
+                            Back to Pokédex
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="recap-button primary"
+                            onClick={handleTryAgain}
+                        >
+                            Try Again
+                        </button>
+                        <button
+                            className="recap-button secondary secondary-blue"
+                            onClick={handleChangeQuiz}
+                        >
+                            Change Quiz
+                        </button>
+                        <button
+                            className="recap-button secondary secondary-blue"
+                            onClick={handleBackToPokédex}
+                        >
+                            Back to Pokédex
+                        </button>
+                    </>
+                )}
+            </div>
+
             {/* Question Review Section */}
             <div className="recap-questions-section">
                 {isSuddenDeath ? (
@@ -366,53 +377,6 @@ const QuizRecap: React.FC = () => {
                                 question={questions[index] || answer}
                             />
                         ))}
-                    </>
-                )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="recap-actions">
-                {isSuddenDeath ? (
-                    <>
-                        <button
-                            className="recap-button primary"
-                            onClick={handleTryAgain}
-                        >
-                            Try Again Sudden Death
-                        </button>
-                        <button
-                            className="recap-button secondary"
-                            onClick={handleChangeQuiz}
-                        >
-                            Change Quiz
-                        </button>
-                        <button
-                            className="recap-button secondary"
-                            onClick={handleBackToPokédex}
-                        >
-                            Back to Pokédex
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <button
-                            className="recap-button primary"
-                            onClick={handleTryAgain}
-                        >
-                            Try Again
-                        </button>
-                        <button
-                            className="recap-button secondary"
-                            onClick={handleChangeQuiz}
-                        >
-                            Change Quiz
-                        </button>
-                        <button
-                            className="recap-button secondary"
-                            onClick={handleBackToPokédex}
-                        >
-                            Back to Pokédex
-                        </button>
                     </>
                 )}
             </div>
