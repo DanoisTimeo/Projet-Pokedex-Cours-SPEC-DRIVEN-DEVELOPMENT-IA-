@@ -140,27 +140,27 @@ const RecapQuestionDisplay: React.FC<RecapQuestionDisplayProps> = ({
                         <p className="recap-question-text">Which Pokémon has these stats?</p>
                         <div className="recap-question-stats">
                             <div className="recap-stat-row">
-                                <span>HP:</span>
+                                <span>hp:</span>
                                 <span>{data.hp}</span>
                             </div>
                             <div className="recap-stat-row">
-                                <span>ATK:</span>
+                                <span>atk:</span>
                                 <span>{data.attack}</span>
                             </div>
                             <div className="recap-stat-row">
-                                <span>DEF:</span>
+                                <span>def:</span>
                                 <span>{data.defense}</span>
                             </div>
                             <div className="recap-stat-row">
-                                <span>SpA:</span>
+                                <span>sp.atk:</span>
                                 <span>{data.spAtk}</span>
                             </div>
                             <div className="recap-stat-row">
-                                <span>SpD:</span>
+                                <span>sp.def:</span>
                                 <span>{data.spDef}</span>
                             </div>
                             <div className="recap-stat-row">
-                                <span>SPD:</span>
+                                <span>speed:</span>
                                 <span>{data.speed}</span>
                             </div>
                         </div>
@@ -270,12 +270,14 @@ const QuizRecap: React.FC = () => {
     const handleTryAgain = () => {
         if (!result) return;
 
-        // Pre-fill config with same parameters
+        // Keep same config for restart
         sessionStorage.setItem("quizConfig", JSON.stringify(result.config));
         sessionStorage.removeItem("quizResult");
         sessionStorage.removeItem("quizQuestions");
+        // Keep quizPool if it exists for faster restart
 
-        navigate("/quiz");
+        // Navigate directly to play page to restart with same parameters
+        navigate("/quiz/play");
     };
 
     const handleChangeQuiz = () => {

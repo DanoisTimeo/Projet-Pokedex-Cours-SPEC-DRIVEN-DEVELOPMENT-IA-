@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { QuizConfig, QuizDifficulty, QuizLength } from "../types/quiz";
 import type { GenerationListResponse } from "../types/quiz";
-import { fetchGenerationList, buildQuestionPool } from "../services/pokeapi";
-import { buildQuestionPool as buildQuestionPoolService } from "../services/quizService";
+import { fetchGenerationList } from "../services/pokeapi";
+import { buildQuestionPool } from "../services/quizService";
 
 const QuizSetup: React.FC = () => {
     const navigate = useNavigate();
@@ -21,10 +21,29 @@ const QuizSetup: React.FC = () => {
     const [isStarting, setIsStarting] = useState(false);
     const [startError, setStartError] = useState<string>("");
 
-    // Load available generations on mount
+    // Load available generations on mount and restore config if available
     useEffect(() => {
         loadGenerations();
+        restoreConfigFromSession();
     }, []);
+
+    // Restore config from sessionStorage if available (for Try Again functionality)
+    const restoreConfigFromSession = () => {
+        const savedConfig = sessionStorage.getItem("quizConfig");
+        if (savedConfig) {
+            try {
+                const config: QuizConfig = JSON.parse(savedConfig);
+                setDifficulty(config.difficulty);
+                setLength(config.length);
+                setIsCustomGenerations(config.isCustomGenerations);
+                if (config.isCustomGenerations) {
+                    setSelectedGenerations(config.generations);
+                }
+            } catch (error) {
+                console.error("Error restoring quiz config:", error);
+            }
+        }
+    };
 
     /**
      * Load list of available generations from API
@@ -100,7 +119,7 @@ const QuizSetup: React.FC = () => {
             }
 
             // Build question pool
-            const pool = await buildQuestionPoolService(selectedGenerations);
+            const pool = await buildQuestionPool(selectedGenerations);
 
             // Validate pool size
             if (pool.length < questionCount && length !== "Sudden Death") {

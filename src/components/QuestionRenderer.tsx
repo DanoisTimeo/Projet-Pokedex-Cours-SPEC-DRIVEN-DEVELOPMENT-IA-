@@ -143,27 +143,27 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                         <p className="question-text">Which Pokémon has these stats?</p>
                         <div className="question-stats">
                             <div className="stat-row">
-                                <span>HP:</span>
+                                <span>hp:</span>
                                 <span>{data.hp}</span>
                             </div>
                             <div className="stat-row">
-                                <span>ATK:</span>
+                                <span>atk:</span>
                                 <span>{data.attack}</span>
                             </div>
                             <div className="stat-row">
-                                <span>DEF:</span>
+                                <span>def:</span>
                                 <span>{data.defense}</span>
                             </div>
                             <div className="stat-row">
-                                <span>SpA:</span>
+                                <span>sp.atk:</span>
                                 <span>{data.spAtk}</span>
                             </div>
                             <div className="stat-row">
-                                <span>SpD:</span>
+                                <span>sp.def:</span>
                                 <span>{data.spDef}</span>
                             </div>
                             <div className="stat-row">
-                                <span>SPD:</span>
+                                <span>speed:</span>
                                 <span>{data.speed}</span>
                             </div>
                         </div>
@@ -197,8 +197,8 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                             disabled={showFeedback}
                         >
                             <div className="answer-content">
-                                {/* Display image if available (sprite questions) */}
-                                {option.displayData?.image && (
+                                {/* For name-to-image: show image only, no label */}
+                                {question.type === "name-to-image" && option.displayData?.image && (
                                     <img
                                         src={option.displayData.image}
                                         alt="Answer option"
@@ -206,8 +206,19 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
                                     />
                                 )}
 
-                                {/* Display text label */}
-                                <span className="answer-label">{option.label}</span>
+                                {/* For all other types: always show label */}
+                                {question.type !== "name-to-image" && (
+                                    <span className="answer-label">{option.label}</span>
+                                )}
+
+                                {/* For types with both image and label */}
+                                {["number-to-pokemon", "height-weight-to-pokemon", "stats-to-pokemon", "description-to-pokemon", "pre-evolution-to-pokemon", "pokemon-to-post-evolution", "post-evolution-to-pokemon"].includes(question.type) && option.displayData?.image && (
+                                    <img
+                                        src={option.displayData.image}
+                                        alt="Answer option"
+                                        className="answer-image answer-image-small"
+                                    />
+                                )}
 
                                 {/* Show feedback icons after submission */}
                                 {showFeedback && (

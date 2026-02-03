@@ -1567,10 +1567,17 @@ input {
 }
 
 .question-number {
-    font-size: 1.5rem;
-    color: #e63946;
+    font-size: 2.5rem;
+    color: #ffffff;
     font-weight: bold;
-    margin: 10px 0;
+    margin: 15px 0;
+    padding: 20px 15px;
+    background-color: #e63946;
+    border-radius: 8px;
+    border: 3px solid #333;
+    text-align: center;
+    display: inline-block;
+    min-width: 120px;
 }
 
 .question-measurements {
@@ -1700,6 +1707,12 @@ input {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     border: 1px solid #ccc;
+}
+
+.answer-image-small {
+    width: 50px;
+    height: 50px;
+    margin-top: 8px;
 }
 
 .answer-label {
@@ -1918,25 +1931,31 @@ input {
 .quiz-recap-header {
     text-align: center;
     border-bottom: 4px solid #333;
-    padding-bottom: 15px;
+    padding-bottom: 20px;
+    background-color: #f8f9fa;
+    padding: 20px 15px 20px 15px;
+    border-radius: 8px;
 }
 
 .quiz-recap-header h2 {
-    font-size: 20px;
+    font-size: 24px;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    line-height: 1.4;
 }
 
 .quiz-recap-score {
-    font-size: 24px;
+    font-size: 32px;
     color: #e63946;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    line-height: 1.2;
 }
 
 .quiz-recap-percentage {
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
+    margin-bottom: 5px;
 }
 
 .quiz-recap-mode {
@@ -1948,76 +1967,84 @@ input {
 .quiz-recap-content {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 .quiz-recap-question {
-    background-color: #f5f5f5;
+    background-color: #ffffff;
     border: 3px solid #333;
     border-radius: 8px;
-    padding: 15px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
 }
 
-.quiz-recap-question:nth-child(odd) {
-    background-color: #ffffff;
+.quiz-recap-question:nth-child(even) {
+    background-color: #f8f9fa;
 }
 
 .question-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-bottom: 2px solid #e63946;
-    padding-bottom: 8px;
+    gap: 12px;
+    border-bottom: 3px solid #e63946;
+    padding-bottom: 12px;
 }
 
 .question-number {
     background-color: #e63946;
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     flex-shrink: 0;
 }
 
 .question-text {
-    font-size: 13px;
+    font-size: 15px;
     color: #333;
     flex-grow: 1;
+    line-height: 1.4;
+    font-weight: 600;
 }
 
 .question-type-badge {
     background-color: #667eea;
     color: white;
-    padding: 4px 8px;
+    padding: 5px 10px;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: 11px;
     white-space: nowrap;
     text-transform: uppercase;
+    flex-shrink: 0;
 }
 
 .question-content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
 }
 
 .question-display {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
+    padding: 15px;
+    background-color: #ffffff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
 }
 
 .question-image {
     width: 100%;
-    max-width: 150px;
+    max-width: 180px;
     height: auto;
     border: 2px solid #ddd;
     border-radius: 4px;
@@ -2027,47 +2054,52 @@ input {
 .question-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
+    width: 100%;
 }
 
 .stat-item {
     background-color: #f0f0f0;
-    padding: 8px;
+    padding: 10px;
     border-radius: 4px;
-    font-size: 11px;
-    border-left: 3px solid #667eea;
+    font-size: 12px;
+    border-left: 4px solid #667eea;
 }
 
 .stat-label {
     color: #666;
-    font-size: 10px;
+    font-size: 11px;
+    margin-bottom: 3px;
 }
 
 .stat-value {
     color: #333;
     font-weight: bold;
-    margin-top: 2px;
+    font-size: 14px;
 }
 
 .answer-feedback {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
 }
 
 .feedback-section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .feedback-label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
     color: #333;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .feedback-correct {
@@ -2079,62 +2111,67 @@ input {
 }
 
 .feedback-icon {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .answer-options-recap {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .answer-option-recap {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 4px;
+    gap: 12px;
+    background-color: #ffffff;
+    padding: 12px;
+    border-radius: 6px;
     border-left: 4px solid #ddd;
+    border: 2px solid #ddd;
 }
 
 .answer-option-correct {
     background-color: #e8f5e9;
-    border-left-color: #2ecc71;
+    border-left: 4px solid #2ecc71;
+    border-color: #c8e6c9;
 }
 
 .answer-option-incorrect {
     background-color: #ffebee;
-    border-left-color: #e63946;
+    border-left: 4px solid #e63946;
+    border-color: #ffcdd2;
 }
 
 .answer-option-icon {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     flex-shrink: 0;
 }
 
 .answer-option-image {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 4px;
     object-fit: cover;
     flex-shrink: 0;
+    border: 2px solid #ddd;
 }
 
 .answer-option-text {
-    font-size: 12px;
+    font-size: 13px;
     color: #333;
     flex-grow: 1;
+    line-height: 1.4;
 }
 
 .sudden-death-info {
     background-color: #fff3cd;
     border: 2px solid #ffc107;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 12px;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    font-size: 13px;
 }
 
 .sudden-death-info strong {
@@ -2143,33 +2180,34 @@ input {
 
 .quiz-recap-footer {
     border-top: 4px solid #333;
-    padding-top: 15px;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .recap-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
 }
 
 .recap-button {
     background-color: #667eea;
     color: white;
     border: 3px solid #333;
-    padding: 12px;
-    font-size: 11px;
-    border-radius: 4px;
+    padding: 15px 12px;
+    font-size: 12px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
-    min-height: 50px;
+    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.3;
+    font-weight: 600;
 }
 
 .recap-button:hover {
@@ -2192,18 +2230,27 @@ input {
 .recap-buttons-full {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
 }
 
 .recap-buttons-full .recap-button {
-    font-size: 10px;
-    min-height: 45px;
+    font-size: 11px;
+    min-height: 55px;
+    padding: 12px 10px;
 }
 
 /* Responsive design for quiz recap */
 @media (max-width: 768px) {
+    .quiz-recap-header {
+        padding: 15px;
+    }
+
     .quiz-recap-score {
-        font-size: 20px;
+        font-size: 28px;
+    }
+
+    .quiz-recap-header h2 {
+        font-size: 18px;
     }
 
     .question-header {
@@ -2236,8 +2283,18 @@ input {
     }
 
     .answer-option-image {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .quiz-recap-question {
+        padding: 15px;
+    }
+
+    .recap-button {
+        min-height: 50px;
+        padding: 12px;
+        font-size: 11px;
     }
 }
 

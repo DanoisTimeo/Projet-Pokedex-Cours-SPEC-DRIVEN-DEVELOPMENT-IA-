@@ -435,11 +435,66 @@
     - [x] Update handleConfirmQuit to persist questions before navigation
     - [x] Enable recap page to display full question context
 
-### Phase 2.5: Routing & Navigation
+### Phase 2.5: Routing & Navigation - ✅ COMPLETED
 
-- [ ] Update App.tsx with /quiz, /quiz/play, /quiz/recap routes
-- [ ] Add "Quiz" button to PokemonList page
-- [ ] Test navigation flows
+- [x] Update App.tsx with /quiz, /quiz/play, /quiz/recap routes
+    - [x] Imported QuizSetup, QuizPlay, QuizRecap components
+    - [x] Added route: /quiz → QuizSetup
+    - [x] Added route: /quiz/play → QuizPlay
+    - [x] Added route: /quiz/recap → QuizRecap
+    - [x] All routes use main gameboy-shell and gameboy-screen containers
+    - [x] Fixed import paths in QuizSetup.tsx (removed duplicate buildQuestionPool import)
+- [x] Add "Quiz" button to PokemonList page
+    - [x] Quiz button added to pokemon-list-header
+    - [x] Button navigates to /quiz route using useNavigate hook
+    - [x] Button styled with quiz-button class
+    - [x] Button appears in header next to Pokédex title
+- [x] Test navigation flows
+    - [x] Verified App.tsx imports and routes configuration
+    - [x] Verified PokemonList.tsx has Quiz button with proper navigation
+    - [x] Verified all quiz page files exist and have proper exports
+    - [x] Verified QuizSetup imports are correct (buildQuestionPool from quizService)
+    - [x] All components properly type-safe with TypeScript
+    - [x] Navigation flow: PokemonList (Quiz button) → QuizSetup → QuizPlay → QuizRecap → PokemonList
+
+#### Phase 2.5.1: Critical Bug Fixes - ✅ COMPLETED
+
+- [x] Fix QuizTimer reset - Remove remainingSeconds from dependency array
+    - [x] Timer now properly resets when timeLimit prop changes
+    - [x] Timer displays correct countdown on new question
+    - [x] Prevents timer from getting stuck at 0
+- [x] Fix Sudden Death mode termination
+    - [x] Quiz now terminates immediately after first wrong answer
+    - [x] Both handleConfirmAnswer and handleTimeUp check for Sudden Death mode
+    - [x] Properly completes quiz instead of continuing indefinitely
+- [x] Fix Pokemon-to-Type question generation
+    - [x] Now generates 4 answer options (correct + 3 wrong type combinations)
+    - [x] Fetches 3 random Pokemon to extract their type combinations
+    - [x] Shuffles options for proper randomization
+- [x] Fix Pokemon-to-Number question generation
+    - [x] Now generates 4 answer options (correct + 3 wrong numbers)
+    - [x] Fetches 3 random Pokemon to extract their IDs
+    - [x] Formats numbers as #XXX for consistent display
+- [x] Fix image/label display in question options
+    - [x] Name-to-image questions: Show image only, no label
+    - [x] Image-to-name questions: Show label only, no image
+    - [x] Number-to-pokemon questions: Show both label and image
+    - [x] All other questions: Show label, hide image unless specifically configured
+- [x] Fix ID number styling in questions
+    - [x] Larger font size (2.5rem) for better visibility
+    - [x] Full background color (#e63946) covering entire number
+    - [x] Proper padding and border for emphasis
+    - [x] Responsive sizing for mobile
+- [x] Improve Quiz Recap page styling
+    - [x] Clearer section headers with larger fonts
+    - [x] Better contrast between correct/incorrect answers
+    - [x] Larger answer images (50px) for better visibility
+    - [x] Proper spacing and padding throughout
+    - [x] Improved recap buttons with better sizing
+    - [x] Mobile responsive design with stacked layouts
+- [x] Add CSS class for small answer images
+    - [x] Created .answer-image-small class for number-to-pokemon display
+    - [x] Allows dual display of image + label in answer options
 
 ## Planned
 

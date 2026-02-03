@@ -14,11 +14,12 @@ import type {
     QuizError,
     QuizPoolEntry
 } from "../types/quiz";
-import type { Pokemon, PokemonSpecies } from "../types/pokemon";
+import type { Pokemon, PokemonSpecies, EvolutionChain, ChainNode } from "../types/pokemon";
 import {
     fetchGenerationDetails,
     fetchPokemonDetails,
-    fetchPokemonSpecies
+    fetchPokemonSpecies,
+    fetchEvolutionChain
 } from "./pokeapi";
 import {
     selectRandomQuestionType,
@@ -161,9 +162,15 @@ function getQuestionCount(length: string): number {
 async function selectWrongAnswers(
     correctAnswer: string,
     pool: string[],
-    count: number
+    count: number,
+    excludeNames: string[] = []
 ): Promise<string[]> {
     const available = filterOut(pool, correctAnswer);
+    // Filter out additional exclusions
+    let filtered = available;
+    for (const exclude of excludeNames) {
+        filtered = filterOut(filtered, exclude);
+    }
 
     if (available.length < count) {
         throw {
@@ -308,7 +315,7 @@ async function generateNameToImage(
 
 async function generatePokemonToType(
     pokemon: Pokemon,
-    _pool: string[],
+    pool: string[],
     questionId: string,
     timeLimit: number
 ): Promise<Question> {
@@ -316,6 +323,53 @@ async function generatePokemonToType(
         .sort((a, b) => a.slot - b.slot)
         .map(t => t.type.name)
         .join("/");
+
+    // Get 3 other Pokemon for wrong type answers
+    const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
+    const wrongPokemon = await Promise.all(
+        wrongAnswers.map(name => fetchPokemonDetails(name))
+    );
+
+    // Generate wrong type combinations
+    let wrongTypes = wrongPokemon.map(p =>
+        p.types
+            .sort((a, b) => a.slot - b.slot)
+            .map(t => t.type.name)
+            .join("/")
+    );
+
+    // Filter out duplicate types (if we accidentally got same type as correct answer)
+    wrongTypes = wrongTypes.filter(type => type !== correctTypes);
+
+    // If we have fewer than 3 unique wrong types, try to add more
+    if (wrongTypes.length < 3) {
+        const allTypes = new Set([correctTypes, ...wrongTypes]);
+        // Add distinct type combinations we might have missed
+        const uniqueTypes = Array.from(allTypes);
+        // Shuffle and take up to 4 total options
+        const allOptions = shuffle([...uniqueTypes]);
+        const selectedOptions = allOptions.slice(0, Math.min(4, allOptions.length));
+        
+        return {
+            id: questionId,
+            type: "pokemon-to-type",
+            difficulty: "Normal",
+            timeLimit,
+            correctAnswer: correctTypes,
+            questionData: {
+                image: pokemon.sprites.other["official-artwork"].front_default,
+                name: pokemon.name,
+                pokemonId: pokemon.id
+            },
+            options: selectedOptions.map((type, index) => ({
+                id: `opt-${index}`,
+                label: type,
+                value: type
+            }))
+        };
+    }
+
+    const allTypes = shuffle([correctTypes, ...wrongTypes]);
 
     return {
         id: questionId,
@@ -328,15 +382,11 @@ async function generatePokemonToType(
             name: pokemon.name,
             pokemonId: pokemon.id
         },
-        options: [
-            {
-                id: "opt-correct",
-                label: correctTypes,
-                value: correctTypes
-            }
-            // Additional options would be generated based on Pokemon type count
-            // This is simplified for infrastructure phase
-        ]
+        options: allTypes.map((type, index) => ({
+            id: `opt-${index}`,
+            label: type,
+            value: type
+        }))
     };
 }
 
@@ -421,11 +471,21 @@ async function generateNumberToPokemon(
 
 async function generatePokemonToNumber(
     pokemon: Pokemon,
-    _pool: string[],
+    pool: string[],
     questionId: string,
     timeLimit: number
 ): Promise<Question> {
     const correctNumber = pokemon.id.toString();
+
+    // Get 3 other Pokemon for wrong number answers
+    const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
+    const wrongPokemon = await Promise.all(
+        wrongAnswers.map(name => fetchPokemonDetails(name))
+    );
+
+    // Generate wrong numbers
+    const wrongNumbers = wrongPokemon.map(p => p.id.toString());
+    const allNumbers = shuffle([correctNumber, ...wrongNumbers]);
 
     return {
         id: questionId,
@@ -438,14 +498,11 @@ async function generatePokemonToNumber(
             name: pokemon.name,
             pokemonId: pokemon.id
         },
-        options: [
-            {
-                id: "opt-correct",
-                label: `#${pokemon.id}`,
-                value: correctNumber
-            }
-            // Additional number options would be generated here
-        ]
+        options: allNumbers.map((num, index) => ({
+            id: `opt-${index}`,
+            label: `#${num}`,
+            value: num
+        }))
     };
 }
 
@@ -455,34 +512,123 @@ async function generatePreEvolutionToPokemon(
     questionId: string,
     timeLimit: number
 ): Promise<Question> {
-    const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
-    const wrongPokemon = await Promise.all(
-        wrongAnswers.map(name => fetchPokemonDetails(name))
-    );
-
-    const allPokemon = [pokemon, ...wrongPokemon];
-    const shuffled = shuffle(allPokemon);
-
-    return {
-        id: questionId,
-        type: "pre-evolution-to-pokemon",
-        difficulty: "Hard",
-        timeLimit,
-        correctAnswer: pokemon.name,
-        questionData: {
-            pokemonName: pokemon.name,
-            pokemonId: pokemon.id,
-            image: pokemon.sprites.other["official-artwork"].front_default
-        },
-        options: shuffled.map(p => ({
+    try {
+        // Fetch species data to get evolution chain
+        const speciesData = await fetchPokemonSpecies(pokemon.name);
+        const evolutionChain = await fetchEvolutionChain(speciesData.evolution_chain.url);
+        
+        // Find the pre-evolution of this pokemon
+        const preEvolutionName = findPreEvolution(pokemon.name, evolutionChain.chain);
+        
+        let correctAnswer: string;
+        let correctPokemon: Pokemon | null = null;
+        
+        if (preEvolutionName) {
+            // Has a pre-evolution
+            correctPokemon = await fetchPokemonDetails(preEvolutionName);
+            correctAnswer = preEvolutionName;
+        } else {
+            // No pre-evolution - use special answer
+            correctAnswer = "no-pre-evolution";
+        }
+        
+        // Generate wrong answers (exclude the correct pre-evolution)
+        const excludeNames = [pokemon.name];
+        if (preEvolutionName) excludeNames.push(preEvolutionName);
+        
+        const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 2, excludeNames);
+        const wrongPokemon = await Promise.all(
+            wrongAnswers.map(name => fetchPokemonDetails(name))
+        );
+        
+        // Build options
+        const options: QuestionOption[] = [];
+        
+        if (correctPokemon) {
+            // Add correct pre-evolution
+            options.push({
+                id: `opt-${correctPokemon.name}`,
+                label: correctPokemon.name,
+                value: correctPokemon.name,
+                displayData: {
+                    image: correctPokemon.sprites.front_default
+                }
+            });
+        }
+        
+        // Add wrong answers
+        wrongPokemon.forEach(p => {
+            options.push({
+                id: `opt-${p.name}`,
+                label: p.name,
+                value: p.name,
+                displayData: {
+                    image: p.sprites.front_default
+                }
+            });
+        });
+        
+        // Always add "no pre-evolution" option
+        options.push({
+            id: "opt-no-pre-evolution",
+            label: "This Pokémon has no pre-evolution",
+            value: "no-pre-evolution",
+            displayData: {}
+        });
+        
+        const shuffled = shuffle(options);
+        
+        return {
+            id: questionId,
+            type: "pre-evolution-to-pokemon",
+            difficulty: "Hard",
+            timeLimit,
+            correctAnswer,
+            questionData: {
+                pokemonName: pokemon.name,
+                pokemonId: pokemon.id,
+                image: pokemon.sprites.other["official-artwork"].front_default
+            },
+            options: shuffled
+        };
+    } catch (error) {
+        console.error("Error generating pre-evolution question:", error);
+        // Fallback: create a question with "no pre-evolution" as correct answer
+        const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
+        const wrongPokemon = await Promise.all(
+            wrongAnswers.map(name => fetchPokemonDetails(name))
+        );
+        
+        const options = wrongPokemon.map(p => ({
             id: `opt-${p.name}`,
             label: p.name,
             value: p.name,
             displayData: {
                 image: p.sprites.front_default
             }
-        }))
-    };
+        }));
+        
+        options.push({
+            id: "opt-no-pre-evolution",
+            label: "This Pokémon has no pre-evolution",
+            value: "no-pre-evolution",
+            displayData: {}
+        });
+        
+        return {
+            id: questionId,
+            type: "pre-evolution-to-pokemon",
+            difficulty: "Hard",
+            timeLimit,
+            correctAnswer: "no-pre-evolution",
+            questionData: {
+                pokemonName: pokemon.name,
+                pokemonId: pokemon.id,
+                image: pokemon.sprites.other["official-artwork"].front_default
+            },
+            options: shuffle(options)
+        };
+    }
 }
 
 async function generatePokemonToPostEvolution(
@@ -491,34 +637,123 @@ async function generatePokemonToPostEvolution(
     questionId: string,
     timeLimit: number
 ): Promise<Question> {
-    const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
-    const wrongPokemon = await Promise.all(
-        wrongAnswers.map(name => fetchPokemonDetails(name))
-    );
-
-    const allPokemon = [pokemon, ...wrongPokemon];
-    const shuffled = shuffle(allPokemon);
-
-    return {
-        id: questionId,
-        type: "pokemon-to-post-evolution",
-        difficulty: "Hard",
-        timeLimit,
-        correctAnswer: pokemon.name,
-        questionData: {
-            image: pokemon.sprites.other["official-artwork"].front_default,
-            name: pokemon.name,
-            pokemonId: pokemon.id
-        },
-        options: shuffled.map(p => ({
+    try {
+        // Fetch species data to get evolution chain
+        const speciesData = await fetchPokemonSpecies(pokemon.name);
+        const evolutionChain = await fetchEvolutionChain(speciesData.evolution_chain.url);
+        
+        // Find the post-evolution of this pokemon
+        const postEvolutionName = findPostEvolution(pokemon.name, evolutionChain.chain);
+        
+        let correctAnswer: string;
+        let correctPokemon: Pokemon | null = null;
+        
+        if (postEvolutionName) {
+            // Has a post-evolution
+            correctPokemon = await fetchPokemonDetails(postEvolutionName);
+            correctAnswer = postEvolutionName;
+        } else {
+            // No post-evolution - use special answer
+            correctAnswer = "no-evolution";
+        }
+        
+        // Generate wrong answers (exclude the correct post-evolution)
+        const excludeNames = [pokemon.name];
+        if (postEvolutionName) excludeNames.push(postEvolutionName);
+        
+        const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 2, excludeNames);
+        const wrongPokemon = await Promise.all(
+            wrongAnswers.map(name => fetchPokemonDetails(name))
+        );
+        
+        // Build options
+        const options: QuestionOption[] = [];
+        
+        if (correctPokemon) {
+            // Add correct post-evolution
+            options.push({
+                id: `opt-${correctPokemon.name}`,
+                label: correctPokemon.name,
+                value: correctPokemon.name,
+                displayData: {
+                    image: correctPokemon.sprites.front_default
+                }
+            });
+        }
+        
+        // Add wrong answers
+        wrongPokemon.forEach(p => {
+            options.push({
+                id: `opt-${p.name}`,
+                label: p.name,
+                value: p.name,
+                displayData: {
+                    image: p.sprites.front_default
+                }
+            });
+        });
+        
+        // Always add "no evolution" option
+        options.push({
+            id: "opt-no-evolution",
+            label: "This Pokémon has no evolution",
+            value: "no-evolution",
+            displayData: {}
+        });
+        
+        const shuffled = shuffle(options);
+        
+        return {
+            id: questionId,
+            type: "pokemon-to-post-evolution",
+            difficulty: "Hard",
+            timeLimit,
+            correctAnswer,
+            questionData: {
+                image: pokemon.sprites.other["official-artwork"].front_default,
+                name: pokemon.name,
+                pokemonId: pokemon.id
+            },
+            options: shuffled
+        };
+    } catch (error) {
+        console.error("Error generating post-evolution question:", error);
+        // Fallback: create a question with "no evolution" as correct answer
+        const wrongAnswers = await selectWrongAnswers(pokemon.name, pool, 3);
+        const wrongPokemon = await Promise.all(
+            wrongAnswers.map(name => fetchPokemonDetails(name))
+        );
+        
+        const options = wrongPokemon.map(p => ({
             id: `opt-${p.name}`,
             label: p.name,
             value: p.name,
             displayData: {
                 image: p.sprites.front_default
             }
-        }))
-    };
+        }));
+        
+        options.push({
+            id: "opt-no-evolution",
+            label: "This Pokémon has no evolution",
+            value: "no-evolution",
+            displayData: {}
+        });
+        
+        return {
+            id: questionId,
+            type: "pokemon-to-post-evolution",
+            difficulty: "Hard",
+            timeLimit,
+            correctAnswer: "no-evolution",
+            questionData: {
+                image: pokemon.sprites.other["official-artwork"].front_default,
+                name: pokemon.name,
+                pokemonId: pokemon.id
+            },
+            options: shuffle(options)
+        };
+    }
 }
 
 async function generateHeightWeightToPokemon(
@@ -592,8 +827,8 @@ async function generateStatsToPokemon(
             hp: stats["hp"],
             attack: stats["attack"],
             defense: stats["defense"],
-            spAtk: stats["sp-atk"],
-            spDef: stats["sp-def"],
+            spAtk: stats["special-attack"],
+            spDef: stats["special-defense"],
             speed: stats["speed"]
         },
         options: shuffled.map(p => ({
@@ -672,6 +907,66 @@ export function calculateQuizResult(session: QuizSession): QuizResult {
         duration,
         isSuddenDeath: session.config.length === "Sudden Death"
     };
+}
+
+// ============================================================================
+// EVOLUTION CHAIN UTILITIES
+// ============================================================================
+
+/**
+ * Recursively collect all species names from evolution chain
+ */
+function collectSpeciesNamesFromChain(chain: ChainNode): string[] {
+    const names = [chain.species.name];
+    
+    for (const evolution of chain.evolves_to) {
+        names.push(...collectSpeciesNamesFromChain(evolution));
+    }
+    
+    return names;
+}
+
+/**
+ * Find pre-evolution of a given pokemon from evolution chain
+ */
+function findPreEvolution(targetPokemon: string, chain: ChainNode): string | null {
+    // Check if any of the direct evolutions match our target
+    for (const evolution of chain.evolves_to) {
+        if (evolution.species.name === targetPokemon) {
+            return chain.species.name; // This is the pre-evolution
+        }
+        
+        // Recursively check deeper in the chain
+        const preEvo = findPreEvolution(targetPokemon, evolution);
+        if (preEvo) {
+            return preEvo;
+        }
+    }
+    
+    return null; // No pre-evolution found
+}
+
+/**
+ * Find post-evolution of a given pokemon from evolution chain
+ */
+function findPostEvolution(targetPokemon: string, chain: ChainNode): string | null {
+    if (chain.species.name === targetPokemon) {
+        // Found our pokemon, check if it has any evolutions
+        if (chain.evolves_to.length > 0) {
+            return chain.evolves_to[0].species.name; // Return first evolution
+        }
+        return null; // No evolution
+    }
+    
+    // Recursively check evolutions
+    for (const evolution of chain.evolves_to) {
+        const postEvo = findPostEvolution(targetPokemon, evolution);
+        if (postEvo) {
+            return postEvo;
+        }
+    }
+    
+    return null;
 }
 
 // ============================================================================

@@ -4,14 +4,16 @@ interface QuizTimerProps {
     timeLimit: number; // Total seconds
     onTimeUp: () => void; // Called when timer reaches 0
     isActive: boolean; // Whether timer should count down
+    questionId: string; // Unique identifier to reset timer on new question
 }
 
-const QuizTimer: React.FC<QuizTimerProps> = ({ timeLimit, onTimeUp, isActive }) => {
+const QuizTimer: React.FC<QuizTimerProps> = ({ timeLimit, onTimeUp, isActive, questionId }) => {
     const [remainingSeconds, setRemainingSeconds] = useState(timeLimit);
 
+    // Reset timer when question changes (using questionId) or timeLimit changes
     useEffect(() => {
         setRemainingSeconds(timeLimit);
-    }, [timeLimit]);
+    }, [timeLimit, questionId]);
 
     useEffect(() => {
         if (!isActive || remainingSeconds <= 0) {
@@ -30,7 +32,7 @@ const QuizTimer: React.FC<QuizTimerProps> = ({ timeLimit, onTimeUp, isActive }) 
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isActive, remainingSeconds, onTimeUp]);
+    }, [isActive, onTimeUp]); // Removed remainingSeconds and timeLimit from dependencies
 
     // Determine color based on remaining time
     const getTimerClass = () => {

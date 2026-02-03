@@ -182,8 +182,13 @@ const QuizPlay: React.FC = () => {
         setShowFeedback(true);
 
         // Auto-advance after 0 second delay
+        // For Sudden Death mode, quit after first wrong answer
         setTimeout(() => {
-            loadQuestion(updatedSession, quizPool);
+            if (updatedSession.config.length === "Sudden Death" && !isCorrect) {
+                completeQuiz(updatedSession);
+            } else {
+                loadQuestion(updatedSession, quizPool);
+            }
         }, 0);
     }, [session, currentQuestion, selectedAnswerId, quizPool]);
 
@@ -210,7 +215,11 @@ const QuizPlay: React.FC = () => {
 
                 setShowFeedback(true);
                 setTimeout(() => {
-                    loadQuestion(updatedSession, quizPool);
+                    if (updatedSession.config.length === "Sudden Death") {
+                        completeQuiz(updatedSession);
+                    } else {
+                        loadQuestion(updatedSession, quizPool);
+                    }
                 }, 0);
             } else {
                 // Auto-submit selected answer
@@ -319,6 +328,7 @@ const QuizPlay: React.FC = () => {
                     )}
                     onTimeUp={handleTimeUp}
                     isActive={timerActive}
+                    questionId={currentQuestion.id}
                 />
 
                 <button
