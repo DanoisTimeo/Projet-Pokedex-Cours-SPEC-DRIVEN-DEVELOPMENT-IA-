@@ -682,7 +682,7 @@ async function generatePreEvolutionToPokemon(
             id: "opt-no-pre-evolution",
             label: "This Pokémon has no pre-evolution",
             value: "no-pre-evolution",
-            displayData: {}
+            displayData: { image: "" }
         });
         
         return {
@@ -807,7 +807,7 @@ async function generatePokemonToPostEvolution(
             id: "opt-no-evolution",
             label: "This Pokémon has no evolution",
             value: "no-evolution",
-            displayData: {}
+            displayData: { image: "" }
         });
         
         return {
