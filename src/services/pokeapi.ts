@@ -9,6 +9,11 @@ import type {
     ChainNode,
     EvolutionDisplayData
 } from "../types/pokemon";
+import type {
+    Generation,
+    GenerationListResponse,
+    GenerationDetailsResponse
+} from "../types/quiz";
 
 const BASE_URL = "https://pokeapi.co/api/v2";
 
@@ -184,3 +189,66 @@ export async function getEvolutionChainData(speciesData: PokemonSpecies): Promis
         return [];
     }
 }
+
+/**
+ * Fetch list of all Pokemon generations
+ * @returns Promise with generations list
+ */
+export async function fetchGenerationList(): Promise<GenerationListResponse> {
+    try {
+        const response = await fetch(`${BASE_URL}/generation`);
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch generation list: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const data: GenerationListResponse = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error fetching generation list: ${error.message}`);
+        }
+        throw new Error("Unknown error occurred while fetching generation list");
+    }
+}
+
+/**
+ * Fetch details for a specific Pokemon generation
+ * @param generationIdOrName - Generation ID (number) or name (string)
+ * @returns Promise with generation details including Pokemon species list
+ */
+export async function fetchGenerationDetails(
+    generationIdOrName: string | number
+): Promise<Generation> {
+    try {
+        const response = await fetch(`${BASE_URL}/generation/${generationIdOrName}`);
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error("No generation found");
+            }
+            throw new Error(
+                `Failed to fetch generation details: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const data: GenerationDetailsResponse = await response.json();
+        
+        // Map response to Generation interface
+        const generation: Generation = {
+            id: data.id,
+            name: data.name,
+            pokemon_species: data.pokemon_species
+        };
+        
+        return generation;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error("Unknown error occurred while fetching generation details");
+    }
+}
+
