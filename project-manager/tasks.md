@@ -226,42 +226,185 @@
 
 ## In Progress
 
-### Phase 2.1: Quiz Infrastructure & Types
+### Phase 2.1: Quiz Infrastructure & Types - ✅ COMPLETED
 
-- [ ] Create src/types/quiz.ts (QuizDifficulty, QuizLength, Generation, QuizConfig, QuestionType, Question, QuizSession, QuizAnswer, QuizResult)
-- [ ] Extend src/services/pokeapi.ts (fetchGenerationList, fetchGenerationDetails, caching)
-- [ ] Create src/utils/quiz.ts (weighted random, shuffle, filter duplicates, calculate score, filter English text)
-- [ ] Create src/services/quizService.ts (buildQuestionPool, generateQuestion, validateAnswer, caching)
+- [x] Create src/types/quiz.ts (QuizDifficulty, QuizLength, Generation, QuizConfig, QuestionType, Question, QuizSession, QuizAnswer, QuizResult)
+    - [x] Define QuizDifficulty type (Normal, Hard, Expert)
+    - [x] Define QuizLength type (Quick, Short, Normal, Long, Sudden Death)
+    - [x] Create Generation interface with pokemon_species array
+    - [x] Create QuizConfig interface with difficulty, length, generations, isCustomGenerations
+    - [x] Create QuestionType union with all 10 question types
+    - [x] Create Question interface with id, type, difficulty, timeLimit, correctAnswer, options, questionData
+    - [x] Create QuestionOption interface with id, label, value, displayData
+    - [x] Create QuizSession interface with config, questions, currentQuestionIndex, answers, timing, status
+    - [x] Create QuizAnswer interface with questionId, questionType, selectedAnswerId, correctAnswerId, isCorrect, timeSpent, answeredAt
+    - [x] Create QuizResult interface with config, totalQuestions, correctAnswers, score, answers, duration, isSuddenDeath
+    - [x] Create API response types (GenerationListResponse, GenerationDetailsResponse)
+    - [x] Create cache and error types
+- [x] Extend src/services/pokeapi.ts (fetchGenerationList, fetchGenerationDetails, caching)
+    - [x] Import generation types from quiz.ts
+    - [x] Implement fetchGenerationList() - fetch list of all generations
+    - [x] Implement fetchGenerationDetails(id) - fetch specific generation with pokemon_species
+    - [x] Add error handling for 404 and network errors
+    - [x] Proper TypeScript typing for generation data
+- [x] Create src/utils/quiz.ts (weighted random, shuffle, filter duplicates, calculate score, filter English text)
+    - [x] weightedRandom<T>(items, weights) - select items based on probability weights
+    - [x] shuffle<T>(array) - Fisher-Yates shuffle implementation
+    - [x] randomSelect<T>(array, count) - select N random items without duplicates
+    - [x] getQuestionTypesForDifficulty(difficulty) - return available types per difficulty
+    - [x] getQuestionTypeWeights(difficulty) - return probability distribution per spec
+    - [x] selectRandomQuestionType(difficulty) - pick random type with weighted distribution
+    - [x] getTimeLimitForQuestion(difficulty, type) - return time limit per difficulty and type
+    - [x] filterEnglishDescription(entries) - extract English text from flavor_text_entries
+    - [x] cleanDescription(text) - remove \f and normalize whitespace
+    - [x] removeDuplicates<T>(array) - return array without duplicates
+    - [x] filterOut<T>(array, exclude) - filter out specific value
+    - [x] calculateScore(correct, total) - return percentage (0-100)
+    - [x] calculateDuration(start, end) - return duration in seconds
+    - [x] validateQuestionPoolSize(poolSize, questionCount) - check sufficiency
+    - [x] validateQuestionData(type, data) - basic validation of question data
+    - [x] shouldAnswerNotBeHere() - 10% probability for Expert mode
+- [x] Create src/services/quizService.ts (buildQuestionPool, generateQuestion, validateAnswer, caching)
+    - [x] QuizServiceCache class with generation, pokemon, species caching
+    - [x] buildQuestionPool(generationIds) - fetch all species from selected generations
+    - [x] generateQuestion(type, difficulty, pokemon, pool, index) - create complete question object
+    - [x] Implement all 10 question type generators:
+        - [x] generateImageToName - display sprite, select name
+        - [x] generateNameToImage - display name, select sprite
+        - [x] generatePokemonToType - display pokemon, select type(s)
+        - [x] generateDescriptionToPokemon - display description, select pokemon
+        - [x] generateNumberToPokemon - display number, select pokemon
+        - [x] generatePokemonToNumber - display pokemon, select number
+        - [x] generatePreEvolutionToPokemon - display evolved form, select pre-evolution
+        - [x] generatePokemonToPostEvolution - display pokemon, select evolution
+        - [x] generateHeightWeightToPokemon - display measurements, select pokemon
+        - [x] generateStatsToPokemon - display stats, select pokemon
+    - [x] validateAnswer(question, selectedId) - check if answer is correct
+    - [x] createQuizSession(config) - initialize new session
+    - [x] recordAnswer(session, answer) - add answer to session
+    - [x] calculateQuizResult(session) - compute final score and result
+    - [x] clearQuizCache() - cleanup session cache
+
+### Phase 2.2: Quiz Setup Page - ✅ COMPLETED
+
+- [x] Create src/pages/QuizSetup.tsx
+    - [x] Setup component with all configuration state
+    - [x] Fetch and display generation list from API
+    - [x] Handle generation loading and errors
+    - [x] Store config in sessionStorage for quiz session
+- [x] Difficulty selector (Normal, Hard, Expert)
+    - [x] Three radio-style buttons with descriptions
+    - [x] Display difficulty info (time limit and question types)
+    - [x] Default: Normal
+- [x] Length selector (Quick, Short, Normal, Long, Sudden Death)
+    - [x] Five option buttons with question counts
+    - [x] Display appropriate count for each option
+    - [x] Default: Normal (20 questions)
+- [x] Generation selector (fetch, checkbox, validation)
+    - [x] Load generation list from /generation endpoint
+    - [x] Default mode: show all generations (auto-selected)
+    - [x] Custom mode: checkboxes for individual selection
+    - [x] Validation: at least one generation required
+    - [x] Build question pool from selected generations
+- [x] Start button (build pool, navigate to /quiz/play)
+    - [x] Validate pool size vs question count
+    - [x] Error handling for insufficient Pokemon
+    - [x] Navigate to /quiz/play with config
+    - [x] Store pool in sessionStorage
+- [x] Update App.tsx with routes
+    - [x] Add /quiz route (QuizSetup)
+    - [x] Add /quiz/play route (QuizPlay)
+    - [x] Add /quiz/recap route (QuizRecap)
+- [x] Add Quiz button to PokemonList
+    - [x] Button in list header
+    - [x] Navigate to /quiz on click
+- [x] Style to match Game Boy theme
+    - [x] Quiz Setup container styling
+    - [x] Difficulty buttons (selected/unselected states)
+    - [x] Length buttons (selected/unselected states)
+    - [x] Generation selector (default/custom modes)
+    - [x] Start button styling
+    - [x] Error/loading message styling
+    - [x] Responsive design for mobile
+    - [x] Back button styling
+
+### Phase 2.3: Quiz Play Page - ✅ COMPLETED
+
+- [x] Create src/pages/QuizPlay.tsx with question loop
+    - [x] Load quiz config and pool from sessionStorage
+    - [x] Initialize quiz session
+    - [x] Display current question number / total
+    - [x] Handle answer selection (highlight selected)
+    - [x] Confirm answer button (disabled until selection)
+    - [x] Auto-advance on answer (0 second delay)
+    - [x] Handle timer timeout (auto-submit or mark wrong)
+    - [x] Quit button with confirmation modal
+    - [x] Error handling for question loading
+    - [x] Sudden Death mode display
+    - [x] Complete quiz when done and navigate to recap
+- [x] Create src/components/QuizTimer.tsx (countdown, auto-submit)
+    - [x] Display remaining seconds countdown
+    - [x] Call onTimeUp callback when timer reaches 0
+    - [x] Color-coded display (safe/warning/critical)
+    - [x] Only countdown when isActive is true
+    - [x] Reset when timeLimit prop changes
+- [x] Create src/components/QuestionRenderer.tsx (dispatch to question types)
+    - [x] Render all 10 question types with proper content
+    - [x] Display answer options as buttons
+    - [x] Visual feedback for selected answer (highlight)
+    - [x] Feedback display after submission (green/red)
+    - [x] Expert mode: "The answer is not here" button
+- [x] Implement 10 question type renderers:
+    - [x] Image → Name (display sprite, select name)
+    - [x] Name → Image (display name, select sprite)
+    - [x] Pokémon → Type(s) (display pokemon, select type)
+    - [x] Description → Pokémon (display description, select pokemon)
+    - [x] Number → Pokémon (display number, select pokemon)
+    - [x] Pokémon → Number (display pokemon, select number)
+    - [x] Pre-evolution → Pokémon (display evolved, select pre-evo)
+    - [x] Pokémon → Post-evolution (display pokemon, select evolution)
+    - [x] Height/Weight → Pokémon (display measurements, select pokemon)
+    - [x] Base Stats → Pokémon (display stats, select pokemon)
+- [x] Answer selection with confirmation button
+    - [x] Click to select answer (visual feedback)
+    - [x] Confirm Answer button enabled only with selection
+    - [x] Disabled during feedback display
+- [x] Expert mode: "The answer is not here" button
+    - [x] Display as 5th option in Expert mode
+    - [x] 10% chance of being correct
+    - [x] 90% chance of being decoy
+    - [x] Proper validation logic
+- [x] Feedback display (green ✅ / red ❌)
+    - [x] Green checkmark for correct
+    - [x] Red X for incorrect
+    - [x] Display selected vs correct answer
+    - [x] No text explanation (visual only per spec)
+- [x] Auto-advance (0 second delay)
+    - [x] Next question loads immediately after feedback
+    - [x] Clear state for new question
+- [x] Quit button with confirmation
+    - [x] Modal dialog asking for confirmation
+    - [x] "Are you sure? Your progress will not be saved."
+    - [x] Quit saves current progress to recap
+    - [x] Cancel returns to question
+- [x] Style to match Game Boy theme
+    - [x] Quiz Play header with question indicator
+    - [x] Timer styling with color codes
+    - [x] Question content styling (image/text types)
+    - [x] Answer buttons with image and text support
+    - [x] Feedback indicator styling
+    - [x] Modal overlay and dialog styling
+    - [x] Responsive design for mobile
+    - [x] Pixel-art friendly image rendering
 
 ## Planned
-
-### Phase 2.2: Quiz Setup Page
-
-- [ ] Create src/pages/QuizSetup.tsx
-- [ ] Difficulty selector (Normal, Hard, Expert)
-- [ ] Length selector (Quick, Short, Normal, Long, Sudden Death)
-- [ ] Generation selector (fetch, checkbox, validation)
-- [ ] Start button (build pool, navigate to /quiz/play)
-- [ ] Style to match Game Boy theme
-
-### Phase 2.3: Quiz Play Page
-
-- [ ] Create src/pages/QuizPlay.tsx with question loop
-- [ ] Create src/components/QuizTimer.tsx (countdown, auto-submit)
-- [ ] Create src/components/QuestionRenderer.tsx (dispatch to question types)
-- [ ] Implement 10 question type renderers (ImageToName, NameToImage, PokemonToType, DescriptionToPokemon, NumberToPokemon, PokemonToNumber, PreEvolutionToPokemon, PokemonToPostEvolution, HeightWeightToPokemon, StatsToPokemon)
-- [ ] Answer selection with confirmation button
-- [ ] Expert mode: "The answer is not here" button (10% correct, 90% decoy)
-- [ ] Feedback display (green ✅ / red ❌, correct: Q+A / incorrect: Q+user+correct)
-- [ ] Auto-advance (0 second delay)
-- [ ] Quit button with confirmation
-- [ ] Style to match Game Boy theme
 
 ### Phase 2.4: Quiz Recap Page
 
 - [ ] Create src/pages/QuizRecap.tsx
 - [ ] Standard mode: "Score: X/Y (Z%)" + all questions in order
 - [ ] Sudden Death mode: "X Questions Correct" + only final question
+
 - [ ] Action buttons (Try Again, Change Quiz, Back to Pokédex)
 - [ ] Style to match Game Boy theme
 

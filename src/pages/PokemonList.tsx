@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchPokemonList, fetchPokemonDetails } from "../services/pokeapi";
 import PokemonCard from "../components/PokemonCard";
 import SearchBar from "../components/SearchBar";
 import type { Pokemon } from "../types/pokemon";
 
 const PokemonList: React.FC = () => {
+    const navigate = useNavigate();
     const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -136,7 +138,16 @@ const PokemonList: React.FC = () => {
 
     return (
         <div className="pokemon-list-container">
-            <h1>Pokédex</h1>
+            <div className="pokemon-list-header">
+                <h1>Pokédex</h1>
+                <button
+                    className="quiz-button"
+                    onClick={() => navigate("/quiz")}
+                    title="Start a quiz"
+                >
+                    Quiz
+                </button>
+            </div>
 
             <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
 
